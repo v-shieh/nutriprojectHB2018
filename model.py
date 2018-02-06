@@ -80,7 +80,7 @@ class Nutrient(db.Model):
                            unique=True,
                            nullable=False)
     nutri_serving = db.Column(db.Integer,
-                              nullable=False)
+                              nullablse=False)
     recom_unit = db.Column(db.String(256),
                            db.ForeignKey('group_nutrients'))
 
@@ -107,6 +107,8 @@ class Food(db.Model):
                              nullable=False)
     food_unit = db.Column(db.String(20),
                           nullable=False)
+    food_desc = db.Column(db.String(256),
+                          nullable=True)
 
     def __repr__(self):
         """Show info about a specific food"""
