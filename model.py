@@ -35,6 +35,9 @@ class User(db.Model):
 
     group = db.relationship('Nutrigroup')
 
+    # Connected to: Nutrigroup
+    # This has a User-Nutrigroup double relationship
+
     def __repr__(self):
         """Show user information"""
 
@@ -46,26 +49,34 @@ class User(db.Model):
 
 
 class Nutrigroup(db.Model):
-    """Group model"""
+    """Group model which gives nutritional requirements about a specific age/gender group"""
 
     __tablename__ = "nutrigroups"
 
     group_id = db.Column(db.Integer,
                          primary_key=True,
                          autoincrement=True)
-    age_range = db.Column(db.Integer,
-                          nullable=False)
+    group_name = db.Column(db.String(50),
+                           nullable=False)
+    min_age = db.Column(db.Integer,
+                        nullable=False)
+    max_age = db.Column(db.Integer,
+                        nullable=False)
     gender = db.Column(db.String(1),
                        nullable=False)
 
     user = db.relationship('User')
 
+    # Connected to: Groups
+    # This has a User-Nutrigroup double relationship
+
     def __repr__(self):
         """Show info about nutrient groups based on gender and age group"""
 
-        return "<Nutrigroup id={id} | range={age} | gender={gender}>".format(id=self.group_id,
-                                                                             age=self.age_range,
-                                                                             gender=self.gender)
+        return "<Nutrigroup id={id} | range={min}-{max} | gender={gender}>".format(id=self.group_id,
+                                                                                   min=self.min_age,
+                                                                                   max=self.max_age,
+                                                                                   gender=self.gender)
 
 
 class Nutrient(db.Model):
@@ -79,10 +90,15 @@ class Nutrient(db.Model):
     nutri_name = db.Column(db.String(256),
                            unique=True,
                            nullable=False)
+    # Some nutrients may be nonexistant for a specific food
     nutri_serving = db.Column(db.Integer,
-                              nullablse=False)
+                              nullable=True)
     recom_unit = db.Column(db.String(256),
                            db.ForeignKey('group_nutrients'))
+
+    # Connected to: Nutrient-Food, Nutrient-Group
+    # This has a single relationshop in the association tables found above
+    # Only has home parameters being id and name because it is separate from foods and connected to Nutrient-Food
 
     def __repr__(self):
         """Show info about specific nutrient"""
@@ -110,6 +126,9 @@ class Food(db.Model):
     food_desc = db.Column(db.String(256),
                           nullable=True)
 
+    # Connected to: Nutrient-Food
+    # This has a single relationshop in the association tables found above
+
     def __repr__(self):
         """Show info about a specific food"""
 
@@ -135,6 +154,8 @@ class Group_Nutrient(db.Model):
                         nullable=False)
     recom_unit = db.Column(db.String(256),
                            nullable=False)
+    upper_lim = db.Column(db.Boolean,
+                          default=False)
 
     nutri_g = db.relationship('Nutrient', backref='group_nutrients')
     group_g = db.relationship('Nutrigroup', backref='group_nutrients')
