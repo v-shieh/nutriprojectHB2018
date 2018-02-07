@@ -85,8 +85,7 @@ class Nutrient(db.Model):
     __tablename__ = "nutrients"
 
     nutrient_id = db.Column(db.Integer,
-                            primary_key=True,
-                            autoincrement=True)
+                            primary_key=True)
     nutri_name = db.Column(db.String(256),
                            unique=True,
                            nullable=False)
