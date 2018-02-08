@@ -4,6 +4,7 @@ from jinja2 import StrictUndefined
 from flask import Flask, render_template
 from flask_debugtoolbar import DebugToolbarExtension
 from model import connect_to_db, db
+from function import get_food_info
 
 app = Flask(__name__)  # Do I need this here?
 
@@ -26,6 +27,8 @@ def index():
 @app.route('/search')
 def search():
     """Takes in input and sends it to the function which determines location"""
+
+    food_name = request.args.get("food-input")
 
     return render_template('search.html')
 
