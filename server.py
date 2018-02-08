@@ -1,10 +1,10 @@
 """Main server file for the nutrition web app"""
 
 from jinja2 import StrictUndefined
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from flask_debugtoolbar import DebugToolbarExtension
 from model import connect_to_db, db
-from function import get_food_info
+# from function import get_food_info
 
 app = Flask(__name__)  # Do I need this here?
 

@@ -74,9 +74,9 @@ class Group(db.Model):
         """Show info about nutrient groups based on gender and age group"""
 
         return "<Group id={id} | range={min}-{max} | gender={gender}>".format(id=self.group_id,
-                                                                                   min=self.min_age,
-                                                                                   max=self.max_age,
-                                                                                   gender=self.gender)
+                                                                              min=self.min_age,
+                                                                              max=self.max_age,
+                                                                              gender=self.gender)
 
 
 class Nutrient(db.Model):
@@ -112,16 +112,17 @@ class Food(db.Model):
 
     food_id = db.Column(db.Integer,
                         nullable=False,
-                        primary_key=True)
+                        primary_key=True,
+                        unique=True)
     food_name = db.Column(db.String(256),
                           nullable=False,
                           unique=True)
     food_serving = db.Column(db.Integer,
                              nullable=False)
-    food_unit = db.Column(db.String(20),
-                          nullable=False)
-    food_desc = db.Column(db.String(256),
-                          nullable=True)
+    food_serving_unit = db.Column(db.String(20),
+                                  nullable=False)
+    # food_desc = db.Column(db.String(256),
+    #                       nullable=True)
 
     # Connected to: Nutrient-Food
     # This has a single relationshop in the association tables found above
@@ -132,7 +133,7 @@ class Food(db.Model):
         return "<Food id={id} | name={name} | serving={serving} | unit={unit}>".format(id=self.food_id,
                                                                                        name=self.food_name,
                                                                                        serving=self.food_serving,
-                                                                                       unit=self.food_unit)
+                                                                                       unit=self.food_serving_unit)
 
 
 class Group_Nutrient(db.Model):
@@ -182,7 +183,7 @@ class Nutrient_Food(db.Model):
     food_id = db.Column(db.Integer,
                         db.ForeignKey('foods.food_id'))
 
-    nutrient= db.relationship('Nutrient', backref='nutrient_food')
+    nutrient = db.relationship('Nutrient', backref='nutrient_food')
     food = db.relationship('Food', backref='nutrient_food')
 
     def __repr__(self):
