@@ -31,12 +31,12 @@ class User(db.Model):
     age = db.Column(db.Integer,
                     nullable=False)
     group_id = db.Column(db.Integer,
-                         db.ForeignKey('nutrigroups.group_id'))
+                         db.ForeignKey('groups.group_id'))
 
-    group = db.relationship('Nutrigroup')
+    group = db.relationship('Group')
 
-    # Connected to: Nutrigroup
-    # This has a User-Nutrigroup double relationship
+    # Connected to: Group
+    # This has a User-Group double relationship
 
     def __repr__(self):
         """Show user information"""
@@ -48,10 +48,10 @@ class User(db.Model):
                                                                                                     g_id=self.nutri_group_id)
 
 
-class Nutrigroup(db.Model):
+class Group(db.Model):
     """Group model which gives nutritional requirements about a specific age/gender group"""
 
-    __tablename__ = "nutrigroups"
+    __tablename__ = "groups"
 
     group_id = db.Column(db.Integer,
                          primary_key=True,
@@ -68,12 +68,12 @@ class Nutrigroup(db.Model):
     user = db.relationship('User')
 
     # Connected to: Groups
-    # This has a User-Nutrigroup double relationship
+    # This has a User-Group double relationship
 
     def __repr__(self):
         """Show info about nutrient groups based on gender and age group"""
 
-        return "<Nutrigroup id={id} | range={min}-{max} | gender={gender}>".format(id=self.group_id,
+        return "<Group id={id} | range={min}-{max} | gender={gender}>".format(id=self.group_id,
                                                                                    min=self.min_age,
                                                                                    max=self.max_age,
                                                                                    gender=self.gender)
@@ -84,16 +84,14 @@ class Nutrient(db.Model):
 
     __tablename__ = "nutrients"
 
-    nutrient_id = db.Column(db.Integer,
-                            primary_key=True)
+    nutri_id = db.Column(db.Integer,
+                         primary_key=True)
     nutri_name = db.Column(db.String(256),
                            unique=True,
                            nullable=False)
     # Some nutrients may be nonexistant for a specific food
-    nutri_serving = db.Column(db.Integer,
-                              nullable=True)
     recom_unit = db.Column(db.String(256),
-                           db.ForeignKey('group_nutrients'))
+                           nullable=False)
 
     # Connected to: Nutrient-Food, Nutrient-Group
     # This has a single relationshop in the association tables found above
@@ -102,7 +100,7 @@ class Nutrient(db.Model):
     def __repr__(self):
         """Show info about specific nutrient"""
 
-        return "<Nutrient id={id} | name={name} | unit={unit}>".format(id=self.nutrient_id,
+        return "<Nutrient id={id} | name={name} | unit={unit}>".format(id=self.nutri_id,
                                                                        name=self.nutri_name,
                                                                        unit=self.recom_unit)
 
@@ -138,7 +136,7 @@ class Food(db.Model):
 
 
 class Group_Nutrient(db.Model):
-    """Association table linking the nutrigroups and nutrients tables"""
+    """Association table linking the groups and nutrients tables"""
 
     __tablename__ = "group_nutrients"
 
@@ -146,18 +144,18 @@ class Group_Nutrient(db.Model):
                                    primary_key=True,
                                    autoincrement=True)
     nutri_id = db.Column(db.Integer,
-                         db.ForeignKey('nutrients'))
+                         db.ForeignKey('nutrients.nutri_id'))
     group_id = db.Column(db.Integer,
-                         db.ForeignKey('nutrigroups'))
+                         db.ForeignKey('groups.group_id'))
     req_amt = db.Column(db.Integer,
                         nullable=False)
-    recom_unit = db.Column(db.String(256),
-                           nullable=False)
-    upper_lim = db.Column(db.Boolean,
-                          default=False)
+    # recom_unit = db.Column(db.String(256),
+    #                        nullable=False)
+    upper_lim = db.Column(db.String(1),
+                          default='f')
 
-    nutri_g = db.relationship('Nutrient', backref='group_nutrients')
-    group_g = db.relationship('Nutrigroup', backref='group_nutrients')
+    nutrient = db.relationship('Nutrient', backref='group_nutrients')
+    group = db.relationship('Group', backref='group_nutrients')
 
     # Lesson 1: You do need repr-s for everything, even association tables
 
@@ -165,7 +163,7 @@ class Group_Nutrient(db.Model):
         """Show info about nutrient requirements in relation to their groups"""
 
         return "<Group id={id} | Nutrient={n_id} | Amt: {amt} {unit}>".format(id=self.group_id,
-                                                                              n_id=self.nutri_g.nutri_name,
+                                                                              n_id=self.nutrient.nutri_name,
                                                                               amt=self.req_amt,
                                                                               unit=self.recom_unit)
 # can i request the nutrient name here?
@@ -180,18 +178,18 @@ class Nutrient_Food(db.Model):
                                   primary_key=True,
                                   autoincrement=True)
     nutri_id = db.Column(db.Integer,
-                         db.ForeignKey('nutrients'))
+                         db.ForeignKey('nutrients.nutri_id'))
     food_id = db.Column(db.Integer,
-                        db.ForeignKey('foods'))
+                        db.ForeignKey('foods.food_id'))
 
-    nutri_f = db.relationship('Nutrient', backref='nutrient_food')
-    food_f = db.relationship('Food', backref='nutrient_food')
+    nutrient= db.relationship('Nutrient', backref='nutrient_food')
+    food = db.relationship('Food', backref='nutrient_food')
 
     def __repr__(self):
         """Show info about foods and their nutrients"""
 
-        return "<Food={foodname} | Nutrient={nutriname}>".format(foodname=self.food_f.food_name,
-                                                                 nutriname=self.nutri_f.nutri_name)
+        return "<Food={foodname} | Nutrient={nutriname}>".format(foodname=self.food.food_name,
+                                                                 nutriname=self.nutrient.nutri_name)
 
 
 ################################################################################################
@@ -208,7 +206,7 @@ def connect_to_db(app):
     """Connect the database to our Flask app."""
 
     # Configure to use our database.
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres:///animals'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres:///nutrireq'
     app.config['SQLALCHEMY_ECHO'] = True  # Marked 'True' for now for better debugging
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db.app = app
