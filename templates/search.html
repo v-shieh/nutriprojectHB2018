@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}Nutrition: Search{% endblock %}
+
+{% block content %}
+<h3>Food Diary</h3>
+
+    <form action="/search">
+        <label name='food-input'> 
+            <input type="text" name="food-input" required>
+        </label><br>
+        <input type="submit" value="Confirm input">
+    </form>
+{% endblock %}

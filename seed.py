@@ -85,6 +85,7 @@ def load_group_nutrient():
 
     db.session.commit()
 
+
 def update_pkey_seqs():
     """Set primary key for each table to start at one higher than the current
     highest key. Helps when data has been manually seeded."""
@@ -98,6 +99,10 @@ def update_pkey_seqs():
         # the dictionary will include a helper class we don't care about, so
         # skip it
         if class_name == "_sa_module_registry":
+            continue
+        elif class_name == "Food":
+            continue
+        elif class_name == "Nutrient":
             continue
 
         print
@@ -152,15 +157,17 @@ def update_pkey_seqs():
 
 
 if __name__ == "__main__":
-    # If this file is called, connect to the db
+    # Import os so you don't have to drop and create tables in terminal
     import os
     os.system("dropdb nutrireq")
     os.system("createdb nutrireq")
 
+    # If this file is called, connect to the db
     app = Flask(__name__)
     connect_to_db(app)
 
-    # Creates tables if they don't exist, otherwise nothing
+    # Creates tables if they don't exist, otherwise nothing; don't need to rerun
+    # model.py
     db.create_all()
 
     # Calls all the db loading functions

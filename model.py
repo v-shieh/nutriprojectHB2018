@@ -111,8 +111,8 @@ class Food(db.Model):
     __tablename__ = "foods"
 
     food_id = db.Column(db.Integer,
-                        primary_key=True,
-                        autoincrement=True)
+                        nullable=False,
+                        primary_key=True)
     food_name = db.Column(db.String(256),
                           nullable=False,
                           unique=True)
