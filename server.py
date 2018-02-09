@@ -4,7 +4,7 @@ from jinja2 import StrictUndefined
 from flask import Flask, render_template, request
 from flask_debugtoolbar import DebugToolbarExtension
 from model import connect_to_db, db
-# from function import get_food_info
+from function import get_food_info
 
 app = Flask(__name__)  # Do I need this here?
 
@@ -23,17 +23,25 @@ def index():
 
     return render_template('homepage.html')
 
-
-@app.route('/search')
-def search():
+@app.route('/search', methods=["GET"])
+def show_search():
     """Takes in input and sends it to the function which determines location"""
 
-    food_name = request.args.get("food-input")
+    return render_template('search.html', food_info=None)
 
-    return render_template('search.html')
+@app.route('/search', methods=['POST'])
+def take_search():
+    """Takes in input and sends it to the function which determines location"""
+
+    food_name = request.form.get("food-input")
+    result = get_food_info(food_name)
+    print result
+
+    return render_template('search.html', food_info=result)
 
 #############################################################################
 if __name__ == "__main__":
+
 
 # Allows us to use our DebugToolbarExtension so it'll be true when we invoke it
 # ex. in python when we want to set up our server

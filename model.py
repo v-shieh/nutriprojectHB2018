@@ -110,14 +110,14 @@ class Food(db.Model):
 
     __tablename__ = "foods"
 
-    food_id = db.Column(db.Integer,
+    food_id = db.Column(db.String(20),
                         nullable=False,
                         primary_key=True,
                         unique=True)
     food_name = db.Column(db.String(256),
                           nullable=False,
                           unique=True)
-    food_serving = db.Column(db.Integer,
+    food_serving = db.Column(db.Float,
                              nullable=False)
     food_serving_unit = db.Column(db.String(20),
                                   nullable=False)
@@ -180,7 +180,7 @@ class Nutrient_Food(db.Model):
                                   autoincrement=True)
     nutri_id = db.Column(db.Integer,
                          db.ForeignKey('nutrients.nutri_id'))
-    food_id = db.Column(db.Integer,
+    food_id = db.Column(db.String(20),
                         db.ForeignKey('foods.food_id'))
 
     nutrient = db.relationship('Nutrient', backref='nutrient_food')
@@ -208,7 +208,7 @@ def connect_to_db(app):
 
     # Configure to use our database.
     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres:///nutrireq'
-    app.config['SQLALCHEMY_ECHO'] = True  # Marked 'True' for now for better debugging
+    app.config['SQLALCHEMY_ECHO'] = False  # Marked 'True' for now for better debugging
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db.app = app
     db.init_app(app)  # Now app and db know about eachother!
@@ -218,9 +218,6 @@ if __name__ == "__main__":
     # you in a state of being able to work with the database directly.
 
     # So that we can use Flask-SQLAlchemy, we'll make a Flask app.
-    from flask import Flask
-
-    app = Flask(__name__)
 
     connect_to_db(app)
     print "Connected to DB."

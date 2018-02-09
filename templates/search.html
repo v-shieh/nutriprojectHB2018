@@ -5,10 +5,14 @@
 {% block content %}
 <h3>Food Diary</h3>
 
-    <form action="/search">
+    <form action="/search" method='POST'>
         <label name='food-input'> 
             <input type="text" name="food-input" required>
         </label><br>
         <input type="submit" value="Confirm input">
     </form>
+    {% if food_info %}
+        {{ food_info }}
+    {% endif %}
+
 {% endblock %}
