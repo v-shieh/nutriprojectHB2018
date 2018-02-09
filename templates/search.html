@@ -7,12 +7,29 @@
 
     <form action="/search" method='POST'>
         <label name='food-input'> 
-            <input type="text" name="food-input" required>
+            <input id="food-input" name="food-input" required>
         </label><br>
         <input type="submit" value="Confirm input">
     </form>
     {% if food_info %}
         {{ food_info }}
     {% endif %}
+
+    {% block JQ %}
+
+        <script>
+        $( function() {
+        let availableFoods = [
+            "Apple",
+            "Blueberry",
+            "Cantaloupe",
+            "Dingo"
+        ];
+        $( "#food-input" ).autocomplete({
+            source: availableFoods
+            });
+        });
+        </script>
+    {% endblock %}
 
 {% endblock %}
