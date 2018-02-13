@@ -5,10 +5,12 @@ from model import User, Group, Nutrient, Food, Group_Nutrient, Nutrient_Food
 from model import connect_to_db, db
 from flask import Flask
 import requests
+from jsonmerge import merge
 from pprint import pprint
 
 # Put here as a global component.
 autocomp_search = []
+in_search = []
 
 def get_food_info(foodname):
     """Checks in db for the food, if not there, makes a request to USDA and adds it
@@ -114,10 +116,34 @@ def separate_measurement_from_qty(string):
 
     return amount, measurement
 
+
 def pull_autocomplete_food_names(query):
-    """Uses USDA API to requests all names of cooked and raw foods and places them in a list"""
-    offset_count = 0
+    """
+    Uses USDA API to requests all names of cooked and raw foods and places them in a list.
+    Keeps track by keeping the name of the query in a separate list
+    """
     idx_count = 0
+
+    if query in in_search:
+        print "ALREADY IN LIST!"
+        # Pull the results from the json_merge fxn
+    else:
+        in_search.append(query)
+        results = json_merge(query)
+
+        # Keep loop going as long as the idx_count is less than the total number of results,
+        # append the names that we got into the autocomp_search list and increment by 1
+        while idx_count < results[1]:
+            autocomp_search.append(results[0][idx_count]['name'])
+            idx_count += 1
+
+        print "Complete"
+
+# MAKE ANOTHER FUNCTION THAT DOES THE FUNCTION PULLING AND FACTOR INPUTTING
+
+
+def json_merge(query):
+    """Takes several pages of jsons and merges them together"""
     # Make URL with desired query keyword which will be used to find all the foods matching that
     # ALSO the API_KEY will be the same
     first_basic_url = "https://api.nal.usda.gov/ndb/search/?format=json"
@@ -127,39 +153,51 @@ def pull_autocomplete_food_names(query):
     second_query = "&q="
     third_offset = "&sort=n&max=1500&offset="
 
-    # There will be several requests going out (the offsets will be increasing everytime so we can get all the data)
-    # Do the request, take out all the names using another for loop and append them into an overarching list
-    # Voila, new list
-
     # Append the query arg and set the initial offset to 0
     second_query += query
-    third_offset += "0"
+    third_var_offset = third_offset + "0"
 
     # Make the initial request to find the total amount of entries for that specific query
-    d = requests.get(first_basic_url + second_query + third_offset + last_api_key)
+    d = requests.get(first_basic_url + second_query + third_var_offset + last_api_key)
     data = d.json()
-    # pprint(data)
+    data_filter = data['list']['item']
 
-    third_offset = "&sort=n&offset="
+    third_var_offset = third_offset
 
     # Store the total amount in the variable query_total
     query_total = int(data['list']['total'])
-    print query_total
-    # while offset_count < query_total:
-    while idx_count <= 1499:
-        autocomp_search.append(data['list']['item'][idx_count]['name'])
-        idx_count += 1
-    idx_count = 0
-        # d = requests.get(first_basic_url + second_query + third_offset + last_api_key)
-        # data = d.json()
-    print "Complete"
+    # print query_total
 
-# MAKE ANOTHER FUNCTION THAT DOES THE FUNCTION PULLING AND FACTOR INPUTTING
+    # Set the offset count to be 1500 (the 'next page' of the USDA API response)
+    offset_count = 1500
+
+    # Keep this process happening while the offset_count < the total results in the repsonse
+    # returned. Keep pulling responses out and merge them together with the existing
+    # json.
+
+    while offset_count < query_total:
+        third_var_offset += str(offset_count)
+
+        # Uncomment to check URL:
+        # print first_basic_url + second_query + third_var_offset + last_api_key
+
+        r = requests.get(first_basic_url + second_query + third_var_offset + last_api_key)
+        request_in_progress = r.json()
+        request_filter = request_in_progress['list']['item']
+
+        # Merge the json dictionaries
+        data_filter += request_filter
+        offset_count += 1500
+        third_var_offset = third_offset
+
+    return data_filter, query_total
+
 
 def delete_autocomplete():
     """Used to completely delete the autocomplete list"""
 
     del autocomp_search[:]
+    del in_search[:]
 
     print "SUCCESS: Autocomplete list has been cleared!"
 
