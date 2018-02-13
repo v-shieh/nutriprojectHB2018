@@ -14,23 +14,17 @@
     {% if food_info %}
         {{ food_info }}
     {% endif %}
-
-
-    {% block JQ %}
-    <script type ="text/javascript" src="INSERTJSFILE"></script>
-        <script>
-        $( function() {
-        let availableFoods = [
-            "Apple",
-            "Blueberry",
-            "Cantaloupe",
-            "Dingo"
-        ];
-        $( "#food-input" ).autocomplete({
-            source: availableFoods
-            });
-        });
-        </script>
-    {% endblock %}
-
 {% endblock %}
+
+{% block JQ %}
+    <script>
+    $( function() {
+    let availableFoods = {{ searchlist| tojson }};
+    $( "#food-input" ).autocomplete({
+        minLength: 3,
+        source: availableFoods
+        });
+    });
+    </script>
+{% endblock %}
+

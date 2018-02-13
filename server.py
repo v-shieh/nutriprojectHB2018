@@ -4,7 +4,7 @@ from jinja2 import StrictUndefined
 from flask import Flask, render_template, request
 from flask_debugtoolbar import DebugToolbarExtension
 from model import connect_to_db, db
-from function import get_food_info
+from function import get_food_info, autocomp_search, pull_autocomplete_food_names
 
 app = Flask(__name__)  # Do I need this here?
 
@@ -27,7 +27,10 @@ def index():
 def show_search():
     """Takes in input and sends it to the function which determines location"""
 
-    return render_template('search.html', food_info=None)
+    pull_autocomplete_food_names('raw')
+    pull_autocomplete_food_names('cooked')
+
+    return render_template('search.html', food_info=None, searchlist=autocomp_search)
 
 @app.route('/search', methods=['POST'])
 def take_search():
@@ -37,7 +40,8 @@ def take_search():
     result = get_food_info(food_name)
     print result
 
-    return render_template('search.html', food_info=result)
+    return render_template('search.html',
+                           food_info=result)
 
 #############################################################################
 if __name__ == "__main__":
