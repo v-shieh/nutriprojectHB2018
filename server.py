@@ -41,7 +41,8 @@ def take_search():
     print result
 
     return render_template('search.html',
-                           food_info=result)
+                           food_info=result,
+                           searchlist=autocomp_search)
 
 #############################################################################
 if __name__ == "__main__":
