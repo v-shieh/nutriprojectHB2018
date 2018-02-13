@@ -124,11 +124,11 @@ def pull_autocomplete_food_names(query):
     """
     idx_count = 0
 
-    if query in in_search:
+    if query.lower() in in_search:
         print "ALREADY IN LIST!"
         # Pull the results from the json_merge fxn
     else:
-        in_search.append(query)
+        in_search.append(query.lower())
         results = json_merge(query)
 
         # Keep loop going as long as the idx_count is less than the total number of results,
