@@ -27,8 +27,12 @@ def index():
 def show_search():
     """Takes in input and sends it to the function which determines location"""
 
-    pull_autocomplete_food_names('raw')
-    pull_autocomplete_food_names('cooked')
+    pull_autocomplete_food_names(1300)  # "Beef products"
+    pull_autocomplete_food_names("0100")  # "Dairy and Egg Products"
+    pull_autocomplete_food_names("0900")  # "Fruits and Fruit Juices"
+    pull_autocomplete_food_names(1500)  # "Finfish and Shellfish Products"
+    pull_autocomplete_food_names(1100)  # "Vegetables and Vegetable Products"
+    pull_autocomplete_food_names(1600)  # "Legumes and Legume Products"
 
     return render_template('search.html', food_info=None, searchlist=autocomp_search)
 
@@ -37,8 +41,12 @@ def take_search():
     """Takes in input and sends it to the function which determines location"""
 
     food_name = request.form.get("food-input")
-    result = get_food_info(food_name)
-    print result
+    food_name_only = food_name[:-6]
+    food_group = int(food_name[-4:])
+    # print food_group
+    result = get_food_info(food_name_only, food_group)
+    # print result
+    # result = None
 
     return render_template('search.html',
                            food_info=result,

@@ -12,35 +12,49 @@ from pprint import pprint
 autocomp_search = []
 in_search = []
 
-def get_food_info(foodname):
+def get_food_info(foodname, food_group):
     """Checks in db for the food, if not there, makes a request to USDA and adds it
     """
 
     # Check to see if this is in the db to begin with.
     db_check = db.session.query(Food).filter(Food.food_name == foodname).first()
-
-    if db_check != None:
+    print db_check
+    if db_check is not None:
         return db_check
-    elif db_check == None:
+    elif db_check is None:
         # Else if the db_check is none, pass the data to the usda_data_fetcher to
         # get data. In order to retrieve this data, we need the food id no that the
         # USDA assigns to its foods which is where ndbno_fetcher comes in. Please
         # go to that function to see how this works.
-        usda_data_fetcher(ndbno_fetcher(foodname))
+        usda_data_fetcher(ndbno_fetcher(foodname, food_group))
         # Returns newly entered entry which previously did not exist.
         return db.session.query(Food).filter(Food.food_name == foodname).first()
 
 
-def ndbno_fetcher(food_name):
+def ndbno_fetcher(food_name, food_group):
     """Find the ndbno (USDA assigned food number) based on given food name"""
     # Get the USDA assigned id no using the Search API from USDA
-    r = requests.get("https://api.nal.usda.gov/ndb/search/?format=json&q=" + food_name + "&sort=n&max=1&offset=0&api_key=G2ssIQLxbLQmJge4m0S73ps40bvAeIN1BpnW5k7V")
+    found = False
+    idx = 0
+
+    r = requests.get("https://api.nal.usda.gov/ndb/search/?format=json&q=" + food_name + "&sort=n&fg=" + str(food_group) + "&max=1500&offset=0&api_key=G2ssIQLxbLQmJge4m0S73ps40bvAeIN1BpnW5k7V")
 
     returned_search = r.json()
+    # pprint(returned_search)
+
     # Return the search as a json which is then parsed in order to extract the id number
-    ndbno = returned_search["list"]['item'][0]['ndbno']
+    # Because the API is annoying and doesn't give me the exact keyword, we have 
+    # to loop through until WE find the exact match
+    while found is False:
+        if returned_search["list"]['item'][idx]['name'] == food_name:
+            found = True
+            ndbno = returned_search["list"]['item'][idx]['ndbno']
+            return ndbno
+        else:
+            idx += 1
+
     # Return the id number
-    return ndbno
+    # return ndbno
 
 
 def usda_data_fetcher(ndbno):
@@ -74,6 +88,7 @@ def usda_data_fetcher(ndbno):
     # Send a request to the USDA database using the URL just built
     d = requests.get(nutrient_data_url)
     data_fetch = d.json()
+    print data_fetch
 
     # Unpack the missing values needed by the database
 
@@ -117,24 +132,25 @@ def separate_measurement_from_qty(string):
     return amount, measurement
 
 
-def pull_autocomplete_food_names(query):
+def pull_autocomplete_food_names(groupno):
     """
-    Uses USDA API to requests all names of cooked and raw foods and places them in a list.
-    Keeps track by keeping the name of the query in a separate list
+    Uses USDA API to requests all names of foods of a given food group and places them in a list.
+    Keeps track by keeping the name of the query in a separate list.
     """
     idx_count = 0
 
-    if query.lower() in in_search:
+    if groupno in in_search:
         print "ALREADY IN LIST!"
         # Pull the results from the json_merge fxn
     else:
-        in_search.append(query.lower())
-        results = json_merge(query)
+        in_search.append(groupno)
+        results = json_merge(groupno)
 
         # Keep loop going as long as the idx_count is less than the total number of results,
         # append the names that we got into the autocomp_search list and increment by 1
         while idx_count < results[1]:
-            autocomp_search.append(results[0][idx_count]['name'])
+            # autocomp_search.append(results[0][idx_count]['name'])
+            autocomp_search.append(results[0][idx_count]['name'] + ", " + str(results[2]))
             idx_count += 1
 
         print "Complete"
@@ -143,22 +159,22 @@ def pull_autocomplete_food_names(query):
 
 
 def json_merge(query):
-    """Takes several pages of jsons and merges them together"""
+    """Takes several pages of json dicts and merges them together"""
     # Make URL with desired query keyword which will be used to find all the foods matching that
     # ALSO the API_KEY will be the same
-    first_basic_url = "https://api.nal.usda.gov/ndb/search/?format=json"
+    first_basic_url = "https://api.nal.usda.gov/ndb/search/?format=json&sort=n"
     last_api_key = "&api_key=G2ssIQLxbLQmJge4m0S73ps40bvAeIN1BpnW5k7V"
 
     # The variables below change
-    second_query = "&q="
-    third_offset = "&sort=n&max=1500&offset="
+    second_food_group = "&fg="
+    third_offset = "&max=1500&offset="
 
     # Append the query arg and set the initial offset to 0
-    second_query += query
+    second_food_group += str(query)
     third_var_offset = third_offset + "0"
 
     # Make the initial request to find the total amount of entries for that specific query
-    d = requests.get(first_basic_url + second_query + third_var_offset + last_api_key)
+    d = requests.get(first_basic_url + second_food_group + third_var_offset + last_api_key)
     data = d.json()
     data_filter = data['list']['item']
 
@@ -166,6 +182,7 @@ def json_merge(query):
 
     # Store the total amount in the variable query_total
     query_total = int(data['list']['total'])
+    group_no = int(data['list']['group'])
     # print query_total
 
     # Set the offset count to be 1500 (the 'next page' of the USDA API response)
@@ -179,9 +196,9 @@ def json_merge(query):
         third_var_offset += str(offset_count)
 
         # Uncomment to check URL:
-        # print first_basic_url + second_query + third_var_offset + last_api_key
+        # print first_basic_url + second_food_group + third_var_offset + last_api_key
 
-        r = requests.get(first_basic_url + second_query + third_var_offset + last_api_key)
+        r = requests.get(first_basic_url + second_food_group + third_var_offset + last_api_key)
         request_in_progress = r.json()
         request_filter = request_in_progress['list']['item']
 
@@ -190,7 +207,7 @@ def json_merge(query):
         offset_count += 1500
         third_var_offset = third_offset
 
-    return data_filter, query_total
+    return data_filter, query_total, group_no
 
 
 def delete_autocomplete():

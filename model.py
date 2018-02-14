@@ -110,7 +110,7 @@ class Food(db.Model):
 
     __tablename__ = "foods"
 
-    food_id = db.Column(db.String(20),
+    food_id = db.Column(db.String(256),
                         nullable=False,
                         primary_key=True,
                         unique=True)
@@ -119,7 +119,7 @@ class Food(db.Model):
                           unique=True)
     food_serving = db.Column(db.Float,
                              nullable=False)
-    food_serving_unit = db.Column(db.String(20),
+    food_serving_unit = db.Column(db.String(256),
                                   nullable=False)
     # food_desc = db.Column(db.String(256),
     #                       nullable=True)
