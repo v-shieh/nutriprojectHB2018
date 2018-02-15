@@ -7,6 +7,7 @@ from model import connect_to_db, db
 # from server import app
 from flask import Flask
 from sqlalchemy.inspection import inspect
+from function import pull_autocomplete_food_names
 
 import csv
 

@@ -1,10 +1,11 @@
 """Main server file for the nutrition web app"""
 
 from jinja2 import StrictUndefined
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
 from model import connect_to_db, db
 from function import get_food_info, autocomp_search, pull_autocomplete_food_names
+import json
 
 app = Flask(__name__)  # Do I need this here?
 
@@ -36,21 +37,22 @@ def show_search():
 
     return render_template('search.html', food_info=None, searchlist=autocomp_search)
 
+
 @app.route('/search', methods=['POST'])
+# @app.route('/search_inputted', methods=['POST'])
 def take_search():
     """Takes in input and sends it to the function which determines location"""
 
-    food_name = request.form.get("food-input")
+    # food_name = request.form.get("food-input")  # This was the non AJAX test route
+    food_name = request.form.get("input")  # This is the AJAX route
+
     food_name_only = food_name[:-6]
-    food_group = int(food_name[-4:])
+    # print food_name_only
+    food_group = str(food_name[-4:])
     # print food_group
     result = get_food_info(food_name_only, food_group)
     # print result
-    # result = None
-
-    return render_template('search.html',
-                           food_info=result,
-                           searchlist=autocomp_search)
+    return jsonify([result.food_name, result.food_serving, result.food_serving_unit])
 
 #############################################################################
 if __name__ == "__main__":

@@ -182,6 +182,7 @@ class Nutrient_Food(db.Model):
                          db.ForeignKey('nutrients.nutri_id'))
     food_id = db.Column(db.String(20),
                         db.ForeignKey('foods.food_id'))
+    amt_nutri_in_food = db.Column(db.Float(20))
 
     nutrient = db.relationship('Nutrient', backref='nutrient_food')
     food = db.relationship('Food', backref='nutrient_food')

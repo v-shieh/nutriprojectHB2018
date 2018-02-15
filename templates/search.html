@@ -2,20 +2,31 @@
 
 {% block title %}Nutrition: Search{% endblock %}
 
+<!-- ************************************************************* -->
+
 {% block content %}
+
 <h3>Food Diary</h3>
 
-    <form action="/search" method='POST'>
+    <form id='food-request' action="/search" method='POST'>
         <label name='food-input'> 
             <input id="food-input" name="food-input" required>
         </label><br>
-        <input type="submit" value="Confirm input">
+        <input type="submit" value="Search!">
     </form>
-    
-    {% if food_info %}
-        {{ food_info }}
-    {% endif %}
+    <br><br>
+    <form id='all-foods-eaten' action="/" method='POST'>
+        <p id="food-list">
+        <!-- {% if food_info %}
+            {{ food_info }}
+        {% endif %} -->
+        </p>
+        <br>
+        <input type="submit" value = "Confirm inputs" id="send-input">
+    </form>
+
 {% endblock %}
+<!-- ************************************************************* -->
 
 {% block JQ %}
     <script>
@@ -26,6 +37,37 @@
         source: availableFoods
         });
     });
+
+    function showResult(result) {
+        $("#food-list").append("<b>" + result[0] + "<b>") 
+        $("#food-list").append("<br>") 
+        $("#food-list").append("<i>Serving size: </i> " +  result[1] + " " + result[2])
+        $("#food-list").append("<br><br>")
+    }
+
+    function askForFoods(evt) {
+        evt.preventDefault();
+
+        let input = {
+            "input": $('#food-input').val()
+        };
+        console.log(input)
+
+        $.post("/search", 
+               input, 
+               showResult);
+
+    }
+
+
+    $("#food-request").on("submit", askForFoods);
+
+    $("#food-request").on("submit", function(){
+        $("#food-input").val('');
+    });
+
+
+    // $('#show-foods').attr("style", "color:#0000FF")
     </script>
 {% endblock %}
 

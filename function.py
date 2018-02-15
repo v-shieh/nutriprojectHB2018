@@ -40,12 +40,13 @@ def ndbno_fetcher(food_name, food_group):
     r = requests.get("https://api.nal.usda.gov/ndb/search/?format=json&q=" + food_name + "&sort=n&fg=" + str(food_group) + "&max=1500&offset=0&api_key=G2ssIQLxbLQmJge4m0S73ps40bvAeIN1BpnW5k7V")
 
     returned_search = r.json()
-    # pprint(returned_search)
+    pprint(returned_search)
 
     # Return the search as a json which is then parsed in order to extract the id number
-    # Because the API is annoying and doesn't give me the exact keyword, we have 
+    # Because the API is annoying and doesn't give me the exact keyword, we have
     # to loop through until WE find the exact match
     while found is False:
+        # print idx
         if returned_search["list"]['item'][idx]['name'] == food_name:
             found = True
             ndbno = returned_search["list"]['item'][idx]['ndbno']
@@ -84,11 +85,11 @@ def usda_data_fetcher(ndbno):
 
     # Append the tail end of the URL to the full version of the URL
     nutrient_data_url += ndbno_indentifier
-
+    # print nutrient_data_url
     # Send a request to the USDA database using the URL just built
     d = requests.get(nutrient_data_url)
     data_fetch = d.json()
-    print data_fetch
+    pprint(data_fetch)
 
     # Unpack the missing values needed by the database
 
@@ -98,10 +99,17 @@ def usda_data_fetcher(ndbno):
     complete_measurement = separate_measurement_from_qty(data_fetch['report']['foods'][0]['measure'])
     food_name = data_fetch['report']['foods'][0]['name']
 
-    # Use another function to add it to the database and print a success statement.
+    # Use first db patch function to add the basic serving info of the food
+    # to the database and print a success statement.
+
     database_info_patch(ndbno, complete_measurement, food_name)
 
-    print "Successful patch of the database!"
+    # Second db patch function which puts the amount, food_id, and nutrient_id 
+    # of a nutrient from the data in the nutrient_food table
+
+    food_nutrient_patch(ndbno, data_fetch)
+
+    print "Successful patch of the foods database!"
 
 
 def database_info_patch(ndbno, complete_measurement, food_name):
@@ -115,6 +123,33 @@ def database_info_patch(ndbno, complete_measurement, food_name):
 
     db.session.add(food_insert)
     db.session.commit()
+
+def food_nutrient_patch(ndbno, data_fetch):
+    """Takes in ndbno and data and patches the Nutrient_Food class table"""
+
+    # Clean up the data so you can just get the nutrients part of the data table
+    nutri_list = data_fetch['report']['foods'][0]['nutrients']
+
+    # Go through the list and start storing the values into the database
+
+    for i in range(len(nutri_list)):
+
+        # Get each nutri_id from data everytime you loop around
+        USDA_nutri_id = nutri_list[i]['nutrient_id']
+
+        # Some nutrients are nonexistant for foods. This formats the data into a float
+        # even if it does not exist
+        if nutri_list[i]['value'] == "--":
+            amount = 0.0
+        else:
+            amount = float(nutri_list[i]['value'])
+
+        # Link the info to the columns of the table, add it to a variable, commit it.
+        nutrients_of_food = Nutrient_Food(amt_nutri_in_food=amount,
+                                          food_id=ndbno,
+                                          nutri_id=int(USDA_nutri_id))
+        db.session.add(nutrients_of_food)
+        db.session.commit()
 
 
 def separate_measurement_from_qty(string):
@@ -150,7 +185,7 @@ def pull_autocomplete_food_names(groupno):
         # append the names that we got into the autocomp_search list and increment by 1
         while idx_count < results[1]:
             # autocomp_search.append(results[0][idx_count]['name'])
-            autocomp_search.append(results[0][idx_count]['name'] + ", " + str(results[2]))
+            autocomp_search.append(results[0][idx_count]['name'] + ", " + results[2])
             idx_count += 1
 
         print "Complete"
@@ -182,7 +217,7 @@ def json_merge(query):
 
     # Store the total amount in the variable query_total
     query_total = int(data['list']['total'])
-    group_no = int(data['list']['group'])
+    group_no = str(data['list']['group'])
     # print query_total
 
     # Set the offset count to be 1500 (the 'next page' of the USDA API response)
