@@ -52,10 +52,10 @@ def take_search():
     # print food_group
     result = get_food_info(food_name_only, food_group)
     # print result
-    # if result == "Error":
-    #     flash("That cannot be found!")
-    # else:
-    return jsonify([result.food_name, result.food_serving, result.food_serving_unit])
+    if result == '404':
+        return '404'
+    else:
+        return jsonify([result.food_name, result.food_serving, result.food_serving_unit])
 
 #############################################################################
 if __name__ == "__main__":

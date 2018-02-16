@@ -30,9 +30,14 @@ def get_food_info(foodname, food_group):
         # if usda_data_fetcher(ndbno_fetcher(foodname, food_group)) == "404":
         #     return "Error"
         # else:
-        usda_data_fetcher(ndbno_fetcher(foodname, food_group))
+        result = usda_data_fetcher(ndbno_fetcher(foodname, food_group))
+
+        print result
+        if result == '404':
+            return '404'
+        else:
         # Returns newly entered entry which previously did not exist.
-        return db.session.query(Food).filter(Food.food_name == foodname).first()
+            return db.session.query(Food).filter(Food.food_name == foodname).first()
 
 
 def ndbno_fetcher(food_name, food_group):
@@ -101,9 +106,13 @@ def usda_data_fetcher(ndbno):
     # need to run it through a function which unpacks it correctly. Please
     # refer to that specific function.
 
-    # if data_fetch['report']['foods'][0]['measure']:
-    complete_measurement = separate_measurement_from_qty(data_fetch['report']['foods'][0]['measure'])
-    food_name = data_fetch['report']['foods'][0]['name']
+    while True:
+        try:
+            complete_measurement = separate_measurement_from_qty(data_fetch['report']['foods'][0]['measure'])
+            food_name = data_fetch['report']['foods'][0]['name']
+            break
+        except IndexError:
+            return "404"
 
     # Use first db patch function to add the basic serving info of the food
     # to the database and print a success statement.
