@@ -16,11 +16,11 @@
     </form>
     <br><br>
     <form id='all-foods-eaten' action="/" method='POST'>
-        <p id="food-list">
+        <div class="food-list">
         <!-- {% if food_info %}
             {{ food_info }}
         {% endif %} -->
-        </p>
+        </div>
         <br>
         <input type="submit" value = "Confirm inputs" id="send-input">
     </form>
@@ -39,11 +39,25 @@
     });
 
     function showResult(result) {
-        $("#food-list").append("<b>" + result[0] + "<b>") 
-        $("#food-list").append("<br>") 
-        $("#food-list").append("<i>Serving size: </i> " +  result[1] + " " + result[2])
-        $("#food-list").append("<br><br>")
+        let name = result[0].replace(" ", "").replace(",", "")
+        // let name = 'kale'
+        let buttonName = 'deleteButton' + name;
+        $(".food-list").append("<div id='" + name + "'>")
+        console.log('#' + result[0])
+
+        $('#' + name).append("<b>" + result[0] + "<b> <button type=button id=" + buttonName + ">X</button>").append("<br>") 
+        $('#' + name).append("<i>Serving size: </i> " +  result[1] + " " + result[2])
+        $('#' + name).append("<form id='serving-size'><input type='number' id='serving-amt' placeholder='Enter amt' required> serving(s)</form>")
+        $('#' + name).append("<br>")
+        $('#' + name).append("</div>")
+
+        $("#" + buttonName).on("click", function(evt) {
+            evt.preventDefault;
+            $('#' + name).remove();
+            // console.log(name);
+        });
     }
+
 
     function askForFoods(evt) {
         evt.preventDefault();
@@ -65,7 +79,6 @@
     $("#food-request").on("submit", function(){
         $("#food-input").val('');
     });
-
 
     // $('#show-foods').attr("style", "color:#0000FF")
     </script>
