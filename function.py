@@ -26,6 +26,10 @@ def get_food_info(foodname, food_group):
         # get data. In order to retrieve this data, we need the food id no that the
         # USDA assigns to its foods which is where ndbno_fetcher comes in. Please
         # go to that function to see how this works.
+
+        # if usda_data_fetcher(ndbno_fetcher(foodname, food_group)) == "404":
+        #     return "Error"
+        # else:
         usda_data_fetcher(ndbno_fetcher(foodname, food_group))
         # Returns newly entered entry which previously did not exist.
         return db.session.query(Food).filter(Food.food_name == foodname).first()
@@ -96,6 +100,8 @@ def usda_data_fetcher(ndbno):
     # Because measurements are sent back as essentially one whole string, we
     # need to run it through a function which unpacks it correctly. Please
     # refer to that specific function.
+
+    # if data_fetch['report']['foods'][0]['measure']:
     complete_measurement = separate_measurement_from_qty(data_fetch['report']['foods'][0]['measure'])
     food_name = data_fetch['report']['foods'][0]['name']
 
@@ -104,12 +110,14 @@ def usda_data_fetcher(ndbno):
 
     database_info_patch(ndbno, complete_measurement, food_name)
 
-    # Second db patch function which puts the amount, food_id, and nutrient_id 
+    # Second db patch function which puts the amount, food_id, and nutrient_id
     # of a nutrient from the data in the nutrient_food table
 
     food_nutrient_patch(ndbno, data_fetch)
 
     print "Successful patch of the foods database!"
+    # else:
+    #     return "404"
 
 
 def database_info_patch(ndbno, complete_measurement, food_name):

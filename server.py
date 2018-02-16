@@ -1,7 +1,7 @@
 """Main server file for the nutrition web app"""
 
 from jinja2 import StrictUndefined
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, flash
 from flask_debugtoolbar import DebugToolbarExtension
 from model import connect_to_db, db
 from function import get_food_info, autocomp_search, pull_autocomplete_food_names
@@ -52,6 +52,9 @@ def take_search():
     # print food_group
     result = get_food_info(food_name_only, food_group)
     # print result
+    # if result == "Error":
+    #     flash("That cannot be found!")
+    # else:
     return jsonify([result.food_name, result.food_serving, result.food_serving_unit])
 
 #############################################################################

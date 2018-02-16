@@ -39,11 +39,11 @@
     });
 
     function showResult(result) {
-        let name = result[0].replace(" ", "").replace(",", "")
+        let name = result[0].replace(/\,/g, "").replace(/ /g, '')
         // let name = 'kale'
         let buttonName = 'deleteButton' + name;
         $(".food-list").append("<div id='" + name + "'>")
-        console.log('#' + result[0])
+        console.log('#' + name)
 
         $('#' + name).append("<b>" + result[0] + "<b> <button type=button id=" + buttonName + ">X</button>").append("<br>") 
         $('#' + name).append("<i>Serving size: </i> " +  result[1] + " " + result[2])
