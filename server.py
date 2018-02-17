@@ -57,6 +57,15 @@ def take_search():
     else:
         return jsonify([result.food_name, result.food_serving, result.food_serving_unit])
 
+
+@app.route('/display_foods', methods=['POST'])
+def calculate_nutrients():
+    """
+    Takes in a dictionary of food and serving qty from the search and sends it to
+    be calculated out with a function.
+    """
+
+    pass
 #############################################################################
 if __name__ == "__main__":
 

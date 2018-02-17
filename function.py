@@ -56,12 +56,19 @@ def ndbno_fetcher(food_name, food_group):
     # to loop through until WE find the exact match
     while found is False:
         # print idx
-        if returned_search["list"]['item'][idx]['name'] == food_name:
-            found = True
-            ndbno = returned_search["list"]['item'][idx]['ndbno']
-            return ndbno
-        else:
-            idx += 1
+    # This try/except statement will catch all the API calls that return KeyErrors
+    # and will cause the modal to show to the user
+        while True:
+            try:
+                if returned_search["list"]['item'][idx]['name'] == food_name:
+                    found = True
+                    ndbno = returned_search["list"]['item'][idx]['ndbno']
+                    return ndbno
+                else:
+                    idx += 1
+            except KeyError:
+                return "404"
+
 
     # Return the id number
     # return ndbno
@@ -69,7 +76,8 @@ def ndbno_fetcher(food_name, food_group):
 
 def usda_data_fetcher(ndbno):
     """Takes missing food and fetches data from USDA db to put into local db"""
-
+    if ndbno == '404':
+        return '404'
     # Assign basic components of the URL we are building to variables
     # In the event that we add more nutrients to the list that our webapp provides,
     # we are able to modify the URL.
@@ -106,6 +114,8 @@ def usda_data_fetcher(ndbno):
     # need to run it through a function which unpacks it correctly. Please
     # refer to that specific function.
 
+    # This try/except statement will catch all the API calls that return IndexErrors
+    # and will cause the modal to show to the user
     while True:
         try:
             complete_measurement = separate_measurement_from_qty(data_fetch['report']['foods'][0]['measure'])

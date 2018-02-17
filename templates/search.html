@@ -15,7 +15,7 @@
         <input type="submit" value="Search!">
     </form>
     <br><br>
-    <form id='all-foods-eaten' action="/" method='POST'>
+    <form id='all-foods-eaten' action="/display_foods"  method='POST'>
         <div class="food-list">
         <!-- {% if food_info %}
             {{ food_info }}
@@ -31,6 +31,8 @@
 
 {% block JQ %}
     <script>
+    let inputtedFoods = new Map();
+
     $( function() {
     let availableFoods = {{ searchlist| tojson }};
     $( "#food-input" ).autocomplete({
@@ -38,6 +40,8 @@
         source: availableFoods
         });
     });
+
+
 
     function showResult(result) {
         // If the result is '404', a modal window will pop up which will say that
@@ -54,7 +58,7 @@
                     text: 'Aw, OK', //Button Text
                     val: 'ok', //Button Value
                     eKey: true, //Enter Keypress
-                    addClass: 'btn-light-blue', //Button Classes (btn-large | btn-small | btn-green | btn-light-green | btn-purple | btn-orange | btn-pink | btn-turquoise | btn-blue | btn-light-blue | btn-light-red | btn-red | btn-yellow | btn-white | btn-black | btn-rounded | btn-circle | btn-square | btn-disabled)
+                    addClass: 'btn-light-red', //Button Classes (btn-large | btn-small | btn-green | btn-light-green | btn-purple | btn-orange | btn-pink | btn-turquoise | btn-blue | btn-light-blue | btn-light-red | btn-red | btn-yellow | btn-white | btn-black | btn-rounded | btn-circle | btn-square | btn-disabled)
                     // onClick: function(dialog) {
                     //     console.log(dialog);
                     //     alert('Look in console!');
@@ -86,29 +90,64 @@
                     closebtn: '.modal-close-btn'
                 }
             });
+        $('#food-input').val('');
         }
+        // This function assigns a unique id to both the div given to each instance 
+        // of food inputted and to the delete button of the entry
         else {
-            let name = result[0].replace(/\,/g, "").replace(/ /g, '')
+            // Finds all the commas, spaces, parens of the name and removes them. This
+            // needs to happen because javascript won't accept it otherwise
+            let name = result[0].replace(/\,/g, "").replace(/ /g, '').replace(/\(/g, "").replace(/\)/g, "").replace(/\./g, "")
             // let name = 'kale'
             let buttonName = 'deleteButton' + name;
+            let servingName = 'serving-amt-' + name;
+            let confirmButton = 'confirm-' + name;
+            let editButton = 'edit-' + name;
+
             $(".food-list").append("<div id='" + name + "'>")
             console.log('#' + name)
-
+            // Append the info that is pulled from the database
             $('#' + name).append("<b>" + result[0] + "<b> <button type=button id=" + buttonName + ">X</button>").append("<br>") 
             $('#' + name).append("<i>Serving size: </i> " +  result[1] + " " + result[2])
-            $('#' + name).append("<form id='serving-size'><input type='number' id='serving-amt' placeholder='Enter amt' required> serving(s)</form>")
+            $('#' + name).append("<form id='serving-size'><input type='number' id=" + servingName + " placeholder='Enter amt' min=0 required> serving(s) <button type=button id=" + confirmButton +">&#10004;</button><button type=button id=" + editButton + ">&#x270E</button></form>")
             $('#' + name).append("<br>")
             $('#' + name).append("</div>")
 
+            // If the button is clicked, the whole entire div belonging to the 
+            // entry, its children, and its place in our inputtedFoods map is deleted.
             $("#" + buttonName).on("click", function(evt) {
                 evt.preventDefault;
+                if (inputtedFoods.get(result[0])) {
+                    inputtedFoods.delete(result[0])
+                }
                 $('#' + name).remove();
                 // console.log(name);
             });
+
+            // Once confirm is pressed, the name and the quantity is put into dictionary form. 
+            $("#" + confirmButton).on("click", function(evt) {
+                evt.preventDefault
+                if ($('#' + servingName).val() > 0) {
+                    inputtedFoods.set(result[0], $('#' + servingName).val())
+                    $('#' + servingName).attr('disabled', true)
+                }
+                else {
+                    alert('Number cannot be negative or zero')
+                }
+            });
+
+            $("#" + editButton).on("click", function(evt) {
+                evt.preventDefault
+                $('#' + servingName).attr('disabled', false)
+                inputtedFoods.delete(result[0])
+            });
         }
     }
-
-
+    
+    // Gets the input from the box the user inputted and sends it to the server
+    // to get all the info on that food (or error and give back 404 cause thats 
+    // cool too.) It then returns the results and sends to showResult. Also 
+    // deletes the input each submission with .val(''). This also happens when there's errors.
     function askForFoods(evt) {
         evt.preventDefault();
 
@@ -120,17 +159,22 @@
         $.post("/search", 
                input, 
                showResult);
-
+        $('#food-input').val('');
     }
 
+    function sendFoodsToServer(evt){
+        $.post("/display_food",
+               inputtedFoods);
+    }
 
+    // When user asks for food, run askForFoods function
     $("#food-request").on("submit", askForFoods);
 
-    $("#food-request").on("submit", function(){
-        $("#food-input").val('');
-    });
+    // When done, sends to the server.
+    $("#all-foods-eaten").on("submit", sendFoodsToServer);
 
-    // $('#show-foods').attr("style", "color:#0000FF")
+    
+
     </script>
 {% endblock %}
 
