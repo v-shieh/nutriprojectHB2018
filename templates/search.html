@@ -16,10 +16,10 @@
     </form>
     <br><br>
     <form id='all-foods-eaten' action="/display_foods"  method='POST'>
+        <!-- Creates a hidden field wit hthe name as food-num so that we can send
+        this info over to the server later -->
+        <input type='hidden' name='food-num' id='food-num' value='0'>
         <div class="food-list">
-        <!-- {% if food_info %}
-            {{ food_info }}
-        {% endif %} -->
         </div>
         <br>
         <input type="submit" value = "Confirm inputs" id="send-input">
@@ -31,12 +31,18 @@
 
 {% block JQ %}
     <script>
-    let inputtedFoods = new Map();
+    // Was used to make a dictionary to pass which did
+    // not work
+    let inputtedFoods = {}; 
 
+    var foodNum = 0; // Make a variable called foodNum which is being used as our counter
+
+    // Taken from the JQueryUI page on autocomplete. Uses | tojson to stringify the 
+    // information passed over from the server. 
     $( function() {
     let availableFoods = {{ searchlist| tojson }};
     $( "#food-input" ).autocomplete({
-        minLength: 3,
+        minLength: 3, // Makes sure that the search doesnt start until 3 characters long. Othewise: SLOW
         source: availableFoods
         });
     });
@@ -99,26 +105,36 @@
             // needs to happen because javascript won't accept it otherwise
             let name = result[0].replace(/\,/g, "").replace(/ /g, '').replace(/\(/g, "").replace(/\)/g, "").replace(/\./g, "")
             // let name = 'kale'
-            let buttonName = 'deleteButton' + name;
-            let servingName = 'serving-amt-' + name;
-            let confirmButton = 'confirm-' + name;
-            let editButton = 'edit-' + name;
+            let buttonName = 'deleteButton' + name; // Unique deleteButton name
+            let servingName = 'serving-amt-' + name; // Unique serving input name
+            let confirmButton = 'confirm-' + name; // Unique confirm (checkmark) button name
+            let editButton = 'edit-' + name; // Unique edit (pencil) button name
 
-            $(".food-list").append("<div id='" + name + "'>")
+            $(".food-list").append("<div id='" + name + "'>") // Makes unique div for the food searched
             console.log('#' + name)
-            // Append the info that is pulled from the database
-            $('#' + name).append("<b>" + result[0] + "<b> <button type=button id=" + buttonName + ">X</button>").append("<br>") 
+
+            foodNum ++; // Increment foodNum by 1 
+            var servingQtyName = 'serving-qty-' + foodNum; // Make the unique id to refer to that food's expected serving qty
+            $('#food-num').val(foodNum); // Overwrite the hidden HTML id above to be foodNum
+
+            // Append to the food's unique div the exact name of the food as shown in USDA. Create an 'X' delete button with a unique id pertaining to the food. Make a hidden input field which assigns the value to be the id of the food.
+            $('#' + name).append("<b>" + result[0] + "<b><button type=button id=" + buttonName + ">X</button><input type='hidden' name='food-name-" + foodNum + "' value=" + result[3] + ">").append("<br>") 
+            // Append the basic serving size for the food according to the USDA and pulled from the local database. 
             $('#' + name).append("<i>Serving size: </i> " +  result[1] + " " + result[2])
-            $('#' + name).append("<form id='serving-size'><input type='number' id=" + servingName + " placeholder='Enter amt' min=0 required> serving(s) <button type=button id=" + confirmButton +">&#10004;</button><button type=button id=" + editButton + ">&#x270E</button></form>")
-            $('#' + name).append("<br>")
-            $('#' + name).append("</div>")
+            // Make a box where the user can input a positive number for the amount of servings they ate of the food. A confirm button and an edit button is shown. 
+
+            // Once the confirm button is pressed, it is added to the HTML that is send to the server. If this entry is deleted, then the food id list and the user serving qty is just listed as 'None'
+            // Once the edit button is pressed, it is enabled for editing. 
+            $('#' + name).append("<form id='serving-size'><input type='number' name='serving-size' id=" + servingName + " placeholder='Enter amt' min=0 required>serving(s)<button type=button id=" + confirmButton +">&#10004;</button><button type=button id=" + editButton + ">&#x270E</button></form>")
+            // Appends a hidden field which assigns the unique name 'serving-qty-<insert food name here>' as the id for the input box. Initially the value is ''
+            $('#' + name).append("<input type='hidden' id='" + servingQtyName + "' name='" + servingQtyName + "' value=''><br>");
 
             // If the button is clicked, the whole entire div belonging to the 
             // entry, its children, and its place in our inputtedFoods map is deleted.
             $("#" + buttonName).on("click", function(evt) {
                 evt.preventDefault;
-                if (inputtedFoods.get(result[0])) {
-                    inputtedFoods.delete(result[0])
+                if (inputtedFoods[result[0]]) {
+                    delete inputtedFoods[result[0]]
                 }
                 $('#' + name).remove();
                 // console.log(name);
@@ -128,8 +144,10 @@
             $("#" + confirmButton).on("click", function(evt) {
                 evt.preventDefault
                 if ($('#' + servingName).val() > 0) {
-                    inputtedFoods.set(result[0], $('#' + servingName).val())
-                    $('#' + servingName).attr('disabled', true)
+                    inputtedFoods[result[0]] = $('#' + servingName).val();
+
+                    $('#' + servingName).attr('disabled', true);
+                    $('#'+servingQtyName).attr('value', $('#' + servingName).val());
                 }
                 else {
                     alert('Number cannot be negative or zero')
@@ -139,7 +157,7 @@
             $("#" + editButton).on("click", function(evt) {
                 evt.preventDefault
                 $('#' + servingName).attr('disabled', false)
-                inputtedFoods.delete(result[0])
+                delete inputtedFoods[result[0]]
             });
         }
     }
@@ -162,16 +180,8 @@
         $('#food-input').val('');
     }
 
-    function sendFoodsToServer(evt){
-        $.post("/display_food",
-               inputtedFoods);
-    }
-
     // When user asks for food, run askForFoods function
     $("#food-request").on("submit", askForFoods);
-
-    // When done, sends to the server.
-    $("#all-foods-eaten").on("submit", sendFoodsToServer);
 
     
 

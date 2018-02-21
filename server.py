@@ -4,8 +4,10 @@ from jinja2 import StrictUndefined
 from flask import Flask, render_template, request, jsonify, flash
 from flask_debugtoolbar import DebugToolbarExtension
 from model import connect_to_db, db
-from function import get_food_info, autocomp_search, pull_autocomplete_food_names
+from function import get_food_info, autocomp_search, pull_autocomplete_food_names, calculate_nutri_amount
 import json
+import requests
+import pprint
 
 app = Flask(__name__)  # Do I need this here?
 
@@ -55,7 +57,7 @@ def take_search():
     if result == '404':
         return '404'
     else:
-        return jsonify([result.food_name, result.food_serving, result.food_serving_unit])
+        return jsonify([result.food_name, result.food_serving, result.food_serving_unit, result.food_id])
 
 
 @app.route('/display_foods', methods=['POST'])
@@ -65,7 +67,35 @@ def calculate_nutrients():
     be calculated out with a function.
     """
 
-    pass
+    food_input = []
+    food_qty = []
+    id_qty = {}
+
+    num_foods = int(request.form.get("food-num"))
+    # print num_foods
+
+    for i in range(1, num_foods+1):
+        # print i
+        id_num = request.form.get("food-name-" + str(i))
+        qty_num = request.form.get("serving-qty-" + str(i))
+        if id_num is not None and qty_num is not None:
+            food_input.append(id_num)
+        # print ("Serving test: serving-qty-" + str(i))
+            food_qty.append(qty_num)
+
+    id_qty = dict(zip(food_input, food_qty))
+    print id_qty
+
+    results = calculate_nutri_amount(id_qty)
+    pprint(results)
+
+    # print request.form
+    # print food_input
+    # print food_qty
+    # print id_qty
+    return render_template('displayfood.html',
+                           results=results)
+
 #############################################################################
 if __name__ == "__main__":
 

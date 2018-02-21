@@ -7,6 +7,7 @@ from flask import Flask
 import requests
 from jsonmerge import merge
 from pprint import pprint
+import collections
 
 # Put here as a global component.
 autocomp_search = []
@@ -279,6 +280,37 @@ def delete_autocomplete():
     del in_search[:]
 
     print "SUCCESS: Autocomplete list has been cleared!"
+
+
+def calculate_nutri_amount(dict):
+    """Used to make simple nutrient calculations"""
+
+    nutrients_in_food = {}
+    nutri_calc = {}
+    iter_dict = dict.iteritems()
+
+    # Iterate through the newly iterable dictionary and make first item in the tuple
+    # the key of nutrients_in_food. The value is just the information needed from Nutrient_Food
+    # LEARNING POINT: This is where relationships come into play. You get to link this table
+
+    for k, v in iter_dict:
+        nutrients_in_food[k] = db.session.query(Nutrient_Food.food_id, Nutrient_Food.nutri_id, Nutrient_Food.amt_nutri_in_food).filter(Nutrient_Food.food_id == k).all()
+
+    # pprint(nutrients_in_food)
+
+    for entry in nutrients_in_food:
+        # For each of the foods inputted, give them a dictionary.
+        nutri_calc[entry] = {}
+        for i in nutrients_in_food[entry]:
+            # For each tuple of that food, assign the nutri_id to nutrinum from that part of the tuple, assign the basic nutrient
+            # serving and multiply it by the # of servings the user had and assign it to nutri_qty.
+            nutri_num = i[1]
+            nutri_qty = i[2] * float(dict[entry])
+            # Give the entry at that nutri_id as another key in the nested dictionary and the
+            # calculated qty as the value
+            nutri_calc[entry][nutri_num] = nutri_qty
+
+    return nutri_calc
 
 
 if __name__ == "__main__":
