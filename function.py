@@ -282,7 +282,7 @@ def delete_autocomplete():
     print "SUCCESS: Autocomplete list has been cleared!"
 
 
-def calculate_nutri_amount(dict):
+def calculate_nutri_amount(dict, food_name):
     """Used to make simple nutrient calculations"""
 
     nutrients_in_food = {}
@@ -308,9 +308,24 @@ def calculate_nutri_amount(dict):
             nutri_qty = i[2] * float(dict[entry])
             # Give the entry at that nutri_id as another key in the nested dictionary and the
             # calculated qty as the value
-            nutri_calc[entry][nutri_num] = nutri_qty
+            nutri_calc[entry][nutri_num] = nutri_num_to_name(nutri_num), nutri_qty
 
-    return nutri_calc
+    return [nutri_calc, food_name]
+
+
+def nutri_num_to_name(id_num):
+    """Decodes the id number of the nutrient and returns the name"""
+    num_to_name = {}
+
+    # Query db for all the ids and names in the nutrients table
+    nutri_name = db.session.query(Nutrient.nutri_id, Nutrient.nutri_name).all()
+
+    # Make a dictionary with these values
+    for k, v in nutri_name:
+        num_to_name[k] = v
+
+    # Return the name of the nutrient from the id
+    return num_to_name[id_num]
 
 
 if __name__ == "__main__":

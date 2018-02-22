@@ -69,32 +69,36 @@ def calculate_nutrients():
 
     food_input = []
     food_qty = []
-    id_qty = {}
+    food_names = []
+    nutrient_info = {}
 
     num_foods = int(request.form.get("food-num"))
     # print num_foods
 
     for i in range(1, num_foods+1):
         # print i
+        fname = (request.form.get("name-" + str(i)).encode().replace('(', '').replace(')', ''))
         id_num = request.form.get("food-name-" + str(i))
         qty_num = request.form.get("serving-qty-" + str(i))
-        if id_num is not None and qty_num is not None:
+        nutrient_info[fname] = {}
+        if id_num is not None and qty_num is not None and fname is not None:
             food_input.append(id_num)
-        # print ("Serving test: serving-qty-" + str(i))
             food_qty.append(qty_num)
+            food_names.append(fname)
 
-    id_qty = dict(zip(food_input, food_qty))
-    print id_qty
+    nutrient_info = dict(zip(food_input, food_qty))
+    # print food_names
+    print nutrient_info
 
-    results = calculate_nutri_amount(id_qty)
-    pprint(results)
-
+    result = calculate_nutri_amount(nutrient_info, food_names)
+    print result
     # print request.form
     # print food_input
     # print food_qty
-    # print id_qty
+    # print nutrient_info
     return render_template('displayfood.html',
-                           results=results)
+                           result=result,
+                           food_names=food_names)
 
 #############################################################################
 if __name__ == "__main__":

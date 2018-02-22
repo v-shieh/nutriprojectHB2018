@@ -180,6 +180,8 @@ class Nutrient_Food(db.Model):
                                   autoincrement=True)
     nutri_id = db.Column(db.Integer,
                          db.ForeignKey('nutrients.nutri_id'))
+    # nutri_name = db.Column(db.String(256),
+    #                        db.ForeignKey('nutrients.nutri_name'))
     food_id = db.Column(db.String(20),
                         db.ForeignKey('foods.food_id'))
     amt_nutri_in_food = db.Column(db.Float(20))

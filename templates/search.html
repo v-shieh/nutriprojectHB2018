@@ -103,7 +103,7 @@
         else {
             // Finds all the commas, spaces, parens of the name and removes them. This
             // needs to happen because javascript won't accept it otherwise
-            let name = result[0].replace(/\,/g, "").replace(/ /g, '').replace(/\(/g, "").replace(/\)/g, "").replace(/\./g, "")
+            let name = result[0].replace(/\,/g, "").replace(/ /g, '').replace(/\(/g, "").replace(/\)/g, "").replace(/\./g, "").replace(/\%/g, "")
             // let name = 'kale'
             let buttonName = 'deleteButton' + name; // Unique deleteButton name
             let servingName = 'serving-amt-' + name; // Unique serving input name
@@ -118,7 +118,7 @@
             $('#food-num').val(foodNum); // Overwrite the hidden HTML id above to be foodNum
 
             // Append to the food's unique div the exact name of the food as shown in USDA. Create an 'X' delete button with a unique id pertaining to the food. Make a hidden input field which assigns the value to be the id of the food.
-            $('#' + name).append("<b>" + result[0] + "<b><button type=button id=" + buttonName + ">X</button><input type='hidden' name='food-name-" + foodNum + "' value=" + result[3] + ">").append("<br>") 
+            $('#' + name).append("<b>" + result[0] + "<b><button type=button id=" + buttonName + ">X</button><input type='hidden' name='food-name-" + foodNum + "' value=" + result[3] + "><input type='hidden' name='name-" + foodNum +"' value='(" + (result[0]) + ")'>").append("<br>") 
             // Append the basic serving size for the food according to the USDA and pulled from the local database. 
             $('#' + name).append("<i>Serving size: </i> " +  result[1] + " " + result[2])
             // Make a box where the user can input a positive number for the amount of servings they ate of the food. A confirm button and an edit button is shown. 
