@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}Nutrition: Registration{% endblock %}
+<!-- ************************************************************* -->
+{% block content %}
+Hi
+
+
+<br><br>
+
+{% endblock %}
+<!-- ************************************************************* -->
+
+{% block JQ %}
+    <script>
+        $(function() {
+            $('#sign-in-form').css({
+                'position' : 'absolute',
+                'left' : '50%',
+                'top' : '50%',
+                'margin-left' : function() {return -$(this).outerWidth()/2},
+                'margin-top' : function() {return -$(this).outerHeight()/2},
+            });
+        });
+        
+
+    </script>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}Nutrition: Display{% endblock %}
+
+<!-- ************************************************************* -->
+
+{% block content %}
+    Hello. Here is the passed data: <br><br><hr>
+    
+
+<!-- Put in the measurement! -->
+    {% for food_name in result %} 
+        <h2>{{ food_name }}</h2><br>
+    {% for i in result[food_name]["nutrients"] %}
+        <b>{{ i[1] }} ({{ i[0] }}):</b> {{ i[2] }} {{ i[3] }}<br> 
+    {% endfor %}
+    <br><br>
+    {% endfor %}
+{% endblock %}
+
+<!-- ************************************************************* -->
+
+{% block JQ %}
+{% endblock %}

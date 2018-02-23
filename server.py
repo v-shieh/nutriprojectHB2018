@@ -91,15 +91,30 @@ def calculate_nutrients():
             food_names.append(fname)
 
     id_qty = dict(zip(food_input, food_qty))
-    print id_qty, food_names
+    # print id_qty, food_names
 
     result = calculate_nutri_amount(id_qty, food_names)
 
-    print result
-
+    # print result
 
     return render_template('displayfood.html',
                            result=result)
+
+@app.route('/register')
+def user_registration():
+    """Allow new users to register"""
+
+    pass
+
+    return render_template('registration.html')
+
+@app.route('/welcome', methods=['POST'])
+def welcome_back():
+    """Allow registered users to be redirected to a profile"""
+    pass
+
+    return render_template('registration.html')
+
 
 #############################################################################
 if __name__ == "__main__":

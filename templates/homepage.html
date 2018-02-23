@@ -1,9 +1,46 @@
 {% extends 'base.html' %}
 
 {% block title %}Nutrition: Home{% endblock %}
-
+<!-- ************************************************************* -->
 {% block content %}
-<h1>-Inserts some prayer for code to work-</h1>
 
+<div id="sign-in-box">
+    <div id='sign-in-form'>
+    <h1>Welcome!</h1>
+    <form id='sign-in' action="/main-page" method='POST'>
+            <label name='sign-in-page'> 
+                <b>Email: </b><input type="email" id="email" name="email" placeholder='email@domain.com' maxlength='256' required><br>
+                <b>Password: </b><input type="password" id="pw" name="pw" placeholder='password' required>
+            </label><br><br>
+        <div id='submit-buttons'>
+                <input type="submit" value="Sign-in"><button type='button' id="register-button">Register!</button>
+        </div>
+        </form>
+    </div>
+</div>
+
+
+<br><br>
 <a href="/search">Time to search for foods</a>
+{% endblock %}
+<!-- ************************************************************* -->
+
+{% block JQ %}
+    <script>
+        $(function() {
+            $('#sign-in-form').css({
+                'position' : 'absolute',
+                'left' : '50%',
+                'top' : '50%',
+                'margin-left' : function() {return -$(this).outerWidth()/2},
+                'margin-top' : function() {return -$(this).outerHeight()/2},
+            });
+        });
+
+    $('#register-button').click(function(){
+        window.location.href='/register';
+    })
+        
+
+    </script>
 {% endblock %}

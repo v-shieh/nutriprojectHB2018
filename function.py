@@ -289,7 +289,7 @@ def calculate_nutri_amount(dict, food_names):
     nutrients_in_food = {}
 
     iter_dict = dict.iteritems()
-    name_nutri = {}
+    name_nutri = {}  # This is the only dictionary out of the loop because it needs to be accessible out here
 
     # Iterate through the newly iterable dictionary and make first item in the tuple
     # the key of nutrients_in_food. The value is just the information needed from Nutrient_Food
@@ -298,40 +298,30 @@ def calculate_nutri_amount(dict, food_names):
     for k, v in iter_dict:
         nutrients_in_food[k] = db.session.query(Nutrient_Food.food_id, Nutrient_Food.nutri_id, Nutrient_Food.amt_nutri_in_food, Nutrient.recom_unit, Food.food_name).join(Nutrient).join(Food).filter(Nutrient_Food.food_id == k).all()
 
-    pprint(nutrients_in_food)
-    print "++++++++++++++"
+    # pprint(nutrients_in_food)
 
     for entry in nutrients_in_food:  # Entry = food_id
-        nutri_calc = {}
-        # pprint(nutrients_in_food)
+        nutri_calc = {}  # In loop so each entry has its only nutri_calc dictionary
 
-        # For each of the foods inputted, give them a dictionary
         nutri_calc['id'] = entry
-        # print nutri_calc['id']
-        # name =
-        # For each tuple of that food, assign the nutri_id to nutrinum from that part of the tuple, assign the basic nutrient
-        # serving and multiply it by the # of servings the user had and assign it to nutri_qty.
-        nutrient_info = []
+
+        nutrient_info = []  # Clears out during every iteration of the loop
         for i in range(len(nutrients_in_food[entry])):
+            # For each tuple in nutrients in food, enumerate the index and run until the end
+            # Assign this variable the nutrient id
             nutri_num = nutrients_in_food[entry][i][1]
+            # Assign this variable the amount inputted by the user by the amount of a given nutrient
+            # for a specific food
             nutri_qty = nutrients_in_food[entry][i][2] * float(dict[entry])
+            # Assign this variable the unit of the given nutrient
             nutri_amt = nutrients_in_food[entry][i][3]
+            # Append all this info formatted into a tuple into the nutrient_info list
             nutrient_info.append((nutri_num, nutri_num_to_name(nutri_num), nutri_qty, nutri_amt))
+        # Make a key for nutri_calc titled 'nutrients' and have the value be that list of tuples
         nutri_calc['nutrients'] = nutrient_info
-
-        # print "**********Without adding: ********"
-        # pprint(nutri_calc)
-        # print entry
-
-        print "**********After adding*********"
-
+        # Nest nutri_calc dictionary inside of the name_nutri dict with the key being the name of
+        # the food
         name_nutri[(nutrients_in_food[entry][0][4]).encode()] = nutri_calc
-        # pprint(name_nutri)
-
-    # print "****Out of loop********"
-    pprint(name_nutri)
-        # Give the entry at that nutri_id as another key in the nested dictionary and the
-        # calculated qty as the value
 
     # pprint(name_nutri)
 
