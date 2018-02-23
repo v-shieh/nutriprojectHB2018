@@ -8,6 +8,7 @@ import requests
 from jsonmerge import merge
 from pprint import pprint
 import collections
+# from jinja2 import jinja2.ext.loopcontrols
 
 # Put here as a global component.
 autocomp_search = []
@@ -282,35 +283,59 @@ def delete_autocomplete():
     print "SUCCESS: Autocomplete list has been cleared!"
 
 
-def calculate_nutri_amount(dict, food_name):
+def calculate_nutri_amount(dict, food_names):
     """Used to make simple nutrient calculations"""
 
     nutrients_in_food = {}
-    nutri_calc = {}
+
     iter_dict = dict.iteritems()
+    name_nutri = {}
 
     # Iterate through the newly iterable dictionary and make first item in the tuple
     # the key of nutrients_in_food. The value is just the information needed from Nutrient_Food
     # LEARNING POINT: This is where relationships come into play. You get to link this table
 
     for k, v in iter_dict:
-        nutrients_in_food[k] = db.session.query(Nutrient_Food.food_id, Nutrient_Food.nutri_id, Nutrient_Food.amt_nutri_in_food).filter(Nutrient_Food.food_id == k).all()
+        nutrients_in_food[k] = db.session.query(Nutrient_Food.food_id, Nutrient_Food.nutri_id, Nutrient_Food.amt_nutri_in_food, Nutrient.recom_unit, Food.food_name).join(Nutrient).join(Food).filter(Nutrient_Food.food_id == k).all()
 
-    # pprint(nutrients_in_food)
+    pprint(nutrients_in_food)
+    print "++++++++++++++"
 
-    for entry in nutrients_in_food:
-        # For each of the foods inputted, give them a dictionary.
-        nutri_calc[entry] = {}
-        for i in nutrients_in_food[entry]:
-            # For each tuple of that food, assign the nutri_id to nutrinum from that part of the tuple, assign the basic nutrient
-            # serving and multiply it by the # of servings the user had and assign it to nutri_qty.
-            nutri_num = i[1]
-            nutri_qty = i[2] * float(dict[entry])
-            # Give the entry at that nutri_id as another key in the nested dictionary and the
-            # calculated qty as the value
-            nutri_calc[entry][nutri_num] = nutri_num_to_name(nutri_num), nutri_qty
+    for entry in nutrients_in_food:  # Entry = food_id
+        nutri_calc = {}
+        # pprint(nutrients_in_food)
 
-    return [nutri_calc, food_name]
+        # For each of the foods inputted, give them a dictionary
+        nutri_calc['id'] = entry
+        # print nutri_calc['id']
+        # name =
+        # For each tuple of that food, assign the nutri_id to nutrinum from that part of the tuple, assign the basic nutrient
+        # serving and multiply it by the # of servings the user had and assign it to nutri_qty.
+        nutrient_info = []
+        for i in range(len(nutrients_in_food[entry])):
+            nutri_num = nutrients_in_food[entry][i][1]
+            nutri_qty = nutrients_in_food[entry][i][2] * float(dict[entry])
+            nutri_amt = nutrients_in_food[entry][i][3]
+            nutrient_info.append((nutri_num, nutri_num_to_name(nutri_num), nutri_qty, nutri_amt))
+        nutri_calc['nutrients'] = nutrient_info
+
+        # print "**********Without adding: ********"
+        # pprint(nutri_calc)
+        # print entry
+
+        print "**********After adding*********"
+
+        name_nutri[(nutrients_in_food[entry][0][4]).encode()] = nutri_calc
+        # pprint(name_nutri)
+
+    # print "****Out of loop********"
+    pprint(name_nutri)
+        # Give the entry at that nutri_id as another key in the nested dictionary and the
+        # calculated qty as the value
+
+    # pprint(name_nutri)
+
+    return name_nutri
 
 
 def nutri_num_to_name(id_num):
