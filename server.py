@@ -4,7 +4,7 @@ from jinja2 import StrictUndefined
 from flask import Flask, render_template, request, jsonify, flash
 from flask_debugtoolbar import DebugToolbarExtension
 from model import connect_to_db, db
-from function import get_food_info, autocomp_search, pull_autocomplete_food_names, calculate_nutri_amount
+from function import get_food_info, autocomp_search, pull_autocomplete_food_names, calculate_nutri_amount, in_db, user_db_patch
 import json
 import requests
 import pprint
@@ -100,6 +100,7 @@ def calculate_nutrients():
     return render_template('displayfood.html',
                            result=result)
 
+
 @app.route('/register')
 def user_registration():
     """Allow new users to register"""
@@ -107,6 +108,34 @@ def user_registration():
     pass
 
     return render_template('registration.html')
+
+
+@app.route('/email_check')
+def check_email():
+    """Checks if email in db"""
+
+    email_input = request.args.get("email")
+
+    email_status = in_db(email_input.lower())
+
+    return email_status
+
+
+@app.route('/welcome_newbie', methods=['POST'])
+def add_user():
+    """Adds user to the db"""
+
+    email = request.form.get("reg-email")
+    pw = request.form.get("pw")
+    fname = request.form.get("fname")
+    lname = request.form.get("lname")
+    age = request.form.get("age")
+    gender = request.form.get("gender")
+
+    user_db_patch(email, pw, fname, lname, age, gender)
+
+    return render_template('welcome-newbie.html')
+
 
 @app.route('/welcome', methods=['POST'])
 def welcome_back():

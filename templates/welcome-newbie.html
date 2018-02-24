@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}Nutrition: Welcome!{% endblock %}
+<!-- ************************************************************* -->
+{% block content %}
+<div id="newbie-welcome">
+    <h1> So glad you've joined us! </h1>
+
+</div>
+{% endblock %}
+<!-- ************************************************************* -->
+
+{% block JQ %}
+    <script>
+        $(function() {
+            $('#newbie-welcome').css({
+                'position' : 'absolute',
+                'left' : '50%',
+                'top' : '50%',
+                'margin-left' : function() {return -$(this).outerWidth()/2},
+                'margin-top' : function() {return -$(this).outerHeight()/2},
+            });
+        });
+        
+    </script>
+{% endblock %}

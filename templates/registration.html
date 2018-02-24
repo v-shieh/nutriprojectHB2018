@@ -3,18 +3,37 @@
 {% block title %}Nutrition: Registration{% endblock %}
 <!-- ************************************************************* -->
 {% block content %}
-Hi
-
-
-<br><br>
-
+<div id="registration-form">
+    <h1> So glad you're joining us! </h1>
+<form id='registration' action="/welcome_newbie" method='POST'>
+            <label name='registration-page'>
+            <div id="account-info">
+                <h3>Account info: </h3>
+                <b>Email: </b><input type="email" id="reg-email" name="reg-email" placeholder='Bcorn@unicorn.me' maxlength='60' required><br>
+                <b>Password: </b><input type="password" id="pw" name="pw" placeholder='password' required>
+            </div>
+            <div id="about-you"> 
+                <h3>Tell us about you:</h3>
+                <b>First name: </b><input type="text" id="fname" name="fname" placeholder='Balloonicorn' maxlength='20' required><br>
+                <b>Last name: </b><input type="text" id="lname" name="lname" placeholder='Unicorn' maxlength='20' required><br>
+                
+                <b>Age: </b><input type="number" id="age" name="age" min="1" max="101" placeholder='1' required><br>
+                <b>Biological gender: </b><input type="radio" name="gender" value="m" checked> Male
+                <input type="radio" name="gender" value="f"> Female<br>
+            </div><br>
+            </label><br><br>
+        <div id='submit-buttons'>
+                <input type="submit" value="Sign Me Up!">
+        </div>
+</form>
+</div>
 {% endblock %}
 <!-- ************************************************************* -->
 
 {% block JQ %}
     <script>
         $(function() {
-            $('#sign-in-form').css({
+            $('#registration-form').css({
                 'position' : 'absolute',
                 'left' : '50%',
                 'top' : '50%',
@@ -23,6 +42,30 @@ Hi
             });
         });
         
+        function inDb(result) {
+            console.log(result)
+            if (result == '200') {
+                $('#reg-email').css('border-color', 'red');
+                alert("Email is taken. Enter a new email or sign in!");
+                $('#reg-email').val() == ''
+            }
+            if (result == 'Clear') {
+                $('#reg-email').css('border-color', 'green');
+            }
+        }
+
+        $( "#reg-email" ).change(function(evt) {
+                evt.preventDefault();
+
+                let email_input = {
+                    "email": $('#reg-email').val()
+                };
+                console.log(email_input)
+
+                $.get("/email_check", 
+                       email_input, 
+                       inDb);
+        });
 
     </script>
 {% endblock %}

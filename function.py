@@ -343,6 +343,30 @@ def nutri_num_to_name(id_num):
     return num_to_name[id_num]
 
 
+def in_db(email):
+    """Checks if emails are already in the database"""
+
+    db_results = db.session.query(User).filter(User.email == email).all()
+
+    if db_results:
+        return "200"
+
+    return "Clear"
+
+
+def user_db_patch(email, pw, fname, lname, age, gender):
+    """Adds the newbie to the database"""
+
+    newbie = User(email=email,
+                  pw=pw,
+                  fname=fname,
+                  lname=lname,
+                  age=age,
+                  gender_at_birth=gender)
+
+    db.session.add(newbie)
+    db.session.commit()
+
 if __name__ == "__main__":
     # As a convenience, if we run this module interactively, it will leave
     # you in a state of being able to work with the database directly.
