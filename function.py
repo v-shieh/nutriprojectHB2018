@@ -1,13 +1,13 @@
 """This page contains all the magic functions on this webapp."""
 
 from flask_sqlalchemy import SQLAlchemy
-from model import User, Group, Nutrient, Food, Group_Nutrient, Nutrient_Food
+from model import User, Group, Nutrient, Food, Group_Nutrient, Nutrient_Food, Food_Eaten
 from model import connect_to_db, db
 from flask import Flask
 import requests
-from jsonmerge import merge
 from pprint import pprint
-import collections
+import json
+import datetime
 # from jinja2 import jinja2.ext.loopcontrols
 
 # Put here as a global component.
@@ -323,7 +323,7 @@ def calculate_nutri_amount(dict, food_names):
         # the food
         name_nutri[(nutrients_in_food[entry][0][4]).encode()] = nutri_calc
 
-    # pprint(name_nutri)
+    pprint(name_nutri)
 
     return name_nutri
 
@@ -343,6 +343,21 @@ def nutri_num_to_name(id_num):
     return num_to_name[id_num]
 
 
+def patch_food_log(user_id, json_result):
+    """Puts the user_id and the jsonified data into the database"""
+
+    #  Need to get datetime date here and jsonify data
+    today = datetime.date.today().strftime("%d%m%Y")
+    json_data = json.dumps(json_result)
+
+    log = Food_Eaten(date_entered=today,
+                     user_id=user_id,
+                     entry=json_data)
+
+    db.session.add(log)
+    db.session.commit()
+
+
 def in_db(email):
     """Checks if emails are already in the database"""
 
@@ -357,15 +372,30 @@ def in_db(email):
 def user_db_patch(email, pw, fname, lname, age, gender):
     """Adds the newbie to the database"""
 
+    g = db.session.query(Group.group_id).filter(Group.min_age < age, Group.max_age > age, Group.gender == gender).all()
+    g_id = g[0][0]
+
     newbie = User(email=email,
                   pw=pw,
                   fname=fname,
                   lname=lname,
                   age=age,
-                  gender_at_birth=gender)
+                  gender_at_birth=gender,
+                  group_id=g_id)
 
     db.session.add(newbie)
     db.session.commit()
+
+
+def user_verification(email, pw):
+    """Takes in email, password and checks if the log-in info is correct"""
+
+    data = db.session.query(User.user_id, User.fname).filter(User.email == email, User.pw == pw).all()
+
+    if data == []:
+        return '404'
+
+    return '200', data
 
 if __name__ == "__main__":
     # As a convenience, if we run this module interactively, it will leave

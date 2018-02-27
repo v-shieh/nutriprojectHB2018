@@ -3,6 +3,7 @@
 # use the db.commit/db.add commands
 
 from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
 
 db = SQLAlchemy()
 
@@ -34,6 +35,7 @@ class User(db.Model):
                          db.ForeignKey('groups.group_id'))
 
     group = db.relationship('Group')
+    food_eaten = db.relationship('Food_Eaten')
 
     # Connected to: Group
     # This has a User-Group double relationship
@@ -195,6 +197,35 @@ class Nutrient_Food(db.Model):
         return "<Food={foodname} | Nutrient={nutriname}>".format(foodname=self.food.food_name,
                                                                  nutriname=self.nutrient.nutri_name)
 
+
+class Food_Eaten(db.Model):
+    """
+    Table that holds JSONified foods that a specific user(id) has eaten along with
+    a date stamp
+    """
+
+    __tablename__ = "food_logs"
+
+    entry_id = db.Column(db.Integer,
+                         primary_key=True,
+                         unique=True)
+    # date_entered = db.Column(db.DateTime,
+    #                          nullable=False,
+    #                          default="ISO, DMY")
+    date_entered = db.Column(db.String(8),
+                             nullable=False)
+    user_id = db.Column(db.Integer,
+                        db.ForeignKey('users.user_id'))
+    entry = db.Column(db.String(10000),
+                      nullable=False)
+
+    user = db.relationship('User')
+
+    def __repr__(self):
+        """Show info about food entries"""
+
+        return "<Date Entered={date} | User={id}>".format(date=self.date_entered,
+                                                          nutriname=self.user.user_id)
 
 ################################################################################################
 def init_app():

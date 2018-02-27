@@ -1,10 +1,10 @@
 """Main server file for the nutrition web app"""
 
 from jinja2 import StrictUndefined
-from flask import Flask, render_template, request, jsonify, flash
+from flask import Flask, render_template, request, jsonify, flash, redirect, session
 from flask_debugtoolbar import DebugToolbarExtension
 from model import connect_to_db, db
-from function import get_food_info, autocomp_search, pull_autocomplete_food_names, calculate_nutri_amount, in_db, user_db_patch
+from function import get_food_info, autocomp_search, pull_autocomplete_food_names, calculate_nutri_amount, in_db, user_db_patch, user_verification, patch_food_log
 import json
 import requests
 import pprint
@@ -95,7 +95,8 @@ def calculate_nutrients():
 
     result = calculate_nutri_amount(id_qty, food_names)
 
-    # print result
+    patch_food_log(session['user_id'], result)
+    print "Food entry added to log"
 
     return render_template('displayfood.html',
                            result=result)
@@ -133,16 +134,40 @@ def add_user():
     gender = request.form.get("gender")
 
     user_db_patch(email, pw, fname, lname, age, gender)
+    retrieve_new_user = user_verification(email.encode(), pw.encode())
+
+    session['user_id'] = retrieve_new_user[1][0][0]
+    session['user_name'] = (retrieve_new_user[1][0][1]).encode()
 
     return render_template('welcome-newbie.html')
 
 
-@app.route('/welcome', methods=['POST'])
-def welcome_back():
-    """Allow registered users to be redirected to a profile"""
-    pass
+@app.route('/double_check', methods=['POST'])
+def dbl_check():
+    """
+    Allow registered users to be redirected to a profile if their log-in
+    information is correct. Otherwise sent back to the homepage form
+    """
 
-    return render_template('registration.html')
+    log_in_email = request.form.get("email")
+    log_in_pw = request.form.get("pw")
+
+    result = user_verification(log_in_email.encode(), log_in_pw.encode())
+
+    if result == '404':
+        flash('Email or password did not match. Please try again!')
+        return redirect('/')
+    elif result[0] == '200':
+        session['user_id'] = result[1][0][0]
+        session['user_name'] = (result[1][0][1]).encode()
+        return redirect('/welcome-back')
+
+
+@app.route('/welcome-back')
+def welcome_back():
+    """Welcomes back users"""
+
+    return render_template('welcome-back.html')
 
 
 #############################################################################
@@ -153,6 +178,7 @@ if __name__ == "__main__":
 # ex. in python when we want to set up our server
 
     app.debug = True
+    app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
     # Make sure that templates are not cached in debug mode
     app.jinja_env.auto_reload = app.debug
