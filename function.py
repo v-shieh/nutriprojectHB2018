@@ -347,7 +347,7 @@ def patch_food_log(user_id, json_result):
     """Puts the user_id and the jsonified data into the database"""
 
     #  Need to get datetime date here and jsonify data
-    today = datetime.date.today().strftime("%d%m%Y")
+    today = datetime.date.today().strftime("%m%d%Y")
     json_data = json.dumps(json_result)
 
     log = Food_Eaten(date_entered=today,
@@ -396,6 +396,71 @@ def user_verification(email, pw):
         return '404'
 
     return '200', data
+
+
+def pull_daily_requirements(user_id):
+    """Pulls the daily requirements for user's specifc group"""
+
+    # Query for the group_id assigned to the user at registation
+    user_group = db.session.query(User.group_id).filter(User.user_id == user_id).all()
+
+    # Query for the nutrients with minimums (no upper limits)
+    nutri_no_upper = db.session.query(Nutrient.nutri_name, Group_Nutrient.nutri_id, Group_Nutrient.req_amt, Nutrient.recom_unit).join(Group_Nutrient).filter(Group_Nutrient.group_id == user_group[0][0], Group_Nutrient.upper_lim == 'f').all()
+    no_upper = {}
+
+    # Query for the nutrients with upper limits
+    nutri_upper = db.session.query(Nutrient.nutri_name, Group_Nutrient.nutri_id, Group_Nutrient.req_amt, Nutrient.recom_unit).join(Group_Nutrient).filter(Group_Nutrient.group_id == user_group[0][0], Group_Nutrient.upper_lim == 't').all()
+    upper = {}
+
+    # Iterate through the list of tuples, make a dict with the nutrient_id as the key
+    # and the requirement amount, unit, name as values
+    for i in nutri_no_upper:
+        no_upper[i[1]] = i[2], i[3], i[0]
+
+    for i in nutri_upper:
+        upper[i[1]] = i[2], i[3], i[0]
+
+    return user_group, nutri_no_upper, nutri_upper, no_upper, upper
+
+
+def pull_foods_on_date(date, user_id):
+    """Pulls foods eaten on specified date by user"""
+
+    amt_eaten = {}
+
+    # Query the db for all the entries entered by a user at a given date
+    d = db.session.query(Food_Eaten.entry).filter(Food_Eaten.user_id == user_id, Food_Eaten.date_entered == date).all()
+    dict_string = d[0][0].encode()  # Change into string from unicode
+
+    data = json.loads(dict_string.encode())  # Load the string into a dict
+    data_keys = data.keys()  # Get all the keys
+
+    # For every key (food name), go through all the lists of nutrients. Add the nutrient id
+    # to the new amt_eaten. Use the get method to see if that key exists already. If not
+    # make the value 0 and--irregardless of the value--add the amount from the entry.
+    for key in data_keys:
+        for i in data[key]['nutrients']:
+            amt_eaten[i[0]] = amt_eaten.get(i[0], 0) + i[2]
+
+    return amt_eaten
+
+
+def calculate_deficiency(entry, reqs):
+    """
+    Calculates how many more nutrients are needed based on the user's daily requirement
+    and the amount they have already consumed
+    """
+
+    deficiency = {}
+
+    # Go through the requirement dict and use the nutri ids as the key for the deficiency
+    # dict. Make the value the amt from the requirements minus the amount in the entries of that
+    # day. Also add the units and name of the nutrient
+    for r in reqs:
+        deficiency[r] = reqs[r][0] - entry[r], reqs[r][1], reqs[r][2]
+
+    return deficiency
+
 
 if __name__ == "__main__":
     # As a convenience, if we run this module interactively, it will leave

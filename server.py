@@ -4,10 +4,11 @@ from jinja2 import StrictUndefined
 from flask import Flask, render_template, request, jsonify, flash, redirect, session
 from flask_debugtoolbar import DebugToolbarExtension
 from model import connect_to_db, db
-from function import get_food_info, autocomp_search, pull_autocomplete_food_names, calculate_nutri_amount, in_db, user_db_patch, user_verification, patch_food_log
+from function import *
 import json
 import requests
 import pprint
+import datetime
 
 app = Flask(__name__)  # Do I need this here?
 
@@ -167,7 +168,33 @@ def dbl_check():
 def welcome_back():
     """Welcomes back users"""
 
-    return render_template('welcome-back.html')
+    user_id = session['user_id']
+    requirements = pull_daily_requirements(user_id)
+    requirements_no_limit = requirements[1]
+    lim = requirements[2]
+    no_lim_dict = requirements[3]
+    lim_dict = requirements[4]
+
+    # today = datetime.date.today().strftime("%m%d%Y")
+    all_foods_today = pull_foods_on_date('27022018', user_id)
+
+    a = calculate_deficiency(all_foods_today, lim_dict)
+    b = calculate_deficiency(all_foods_today, no_lim_dict)
+    upper_lim_def = a.values()
+    minimum_def = b.values()
+
+    return render_template('welcome-back.html',
+                           no_lim=requirements_no_limit,
+                           lim=lim,
+                           upper_def=upper_lim_def,
+                           no_upper_def=minimum_def)
+
+
+@app.route('/food-log')
+def show_history():
+    """Lets user pick a date and displays the food info for that date"""
+
+    return render_template('food-log.html')
 
 
 #############################################################################

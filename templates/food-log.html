@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Nutrition: Welcome!{% endblock %}
+<!-- ************************************************************* -->
+{% block content %}
+    <h1>{{ session['user_name'] }}'s Food Log!</h1>
+    <h4>Please pick a date to display </h4>
+
+    <div id='date'>
+        <input type="text" id="datepicker" placeholder="month-day-year">
+    </div>
+
+{% endblock %}
+<!-- ************************************************************* -->
+
+{% block JQ %}
+<script>
+$( function() {
+    $( "#datepicker" ).datepicker({
+        dateFormat: 'mm-dd-yy'
+    });
+    $( "#datepicker" ).datepicker( "option", "showAnim", "slideDown");
+
+  } );
+
+
+
+
+</script>
+{% endblock %}
