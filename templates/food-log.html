@@ -46,11 +46,14 @@ function onThisDay(result) {
     }
     else {
         $('#todays-date').append("<hr>")
-        for (let key in result['food']) {
-            console.log(result['food'])
-            console.log(result['food'][key])
-            for (name in key) {
-                console.log(result['food'][key][name])
+        $('#entry-result').html("");
+        for (let inputs in result['food']) {
+            let a = JSON.parse(result['food'][inputs][0])
+            for (let key in a) {
+                $('#entry-result').append('<h3>' + key + '</h3>');
+                for (let i in a[key]['nutrients']){
+                    $('#entry-result').append("<b>" + a[key]['nutrients'][i][1] + "</b>: " + a[key]['nutrients'][i][2]+ " " + a[key]['nutrients'][i][3] + "<br>");
+                }
             }
         }
     }
