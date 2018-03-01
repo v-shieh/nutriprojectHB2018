@@ -3,7 +3,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from model import User, Group, Nutrient, Food, Group_Nutrient, Nutrient_Food, Food_Eaten
 from model import connect_to_db, db
-from flask import Flask
+from flask import Flask, jsonify
 import requests
 from pprint import pprint
 import json
@@ -423,26 +423,34 @@ def pull_daily_requirements(user_id):
     return user_group, nutri_no_upper, nutri_upper, no_upper, upper
 
 
-def pull_foods_on_date(date, user_id):
+def pull_foods_on_date(date, user_id, option):
     """Pulls foods eaten on specified date by user"""
 
     amt_eaten = {}
 
     # Query the db for all the entries entered by a user at a given date
     d = db.session.query(Food_Eaten.entry).filter(Food_Eaten.user_id == user_id, Food_Eaten.date_entered == date).all()
-    dict_string = d[0][0].encode()  # Change into string from unicode
+    pprint(d)
+    if option == 1:
+        if len(d) == 0:
+            return 'none'
+        else:
+            items = {"food": d}
+            return items
+    elif option == 2:
+        dict_string = d[0][0].encode()  # Change into string from unicode
 
-    data = json.loads(dict_string.encode())  # Load the string into a dict
-    data_keys = data.keys()  # Get all the keys
+        data = json.loads(dict_string.encode())  # Load the string into a dict
+        data_keys = data.keys()  # Get all the keys
 
-    # For every key (food name), go through all the lists of nutrients. Add the nutrient id
-    # to the new amt_eaten. Use the get method to see if that key exists already. If not
-    # make the value 0 and--irregardless of the value--add the amount from the entry.
-    for key in data_keys:
-        for i in data[key]['nutrients']:
-            amt_eaten[i[0]] = amt_eaten.get(i[0], 0) + i[2]
+        # For every key (food name), go through all the lists of nutrients. Add the nutrient id
+        # to the new amt_eaten. Use the get method to see if that key exists already. If not
+        # make the value 0 and--irregardless of the value--add the amount from the entry.
+        for key in data_keys:
+            for i in data[key]['nutrients']:
+                amt_eaten[i[0]] = amt_eaten.get(i[0], 0) + i[2]
 
-    return amt_eaten
+        return amt_eaten
 
 
 def calculate_deficiency(entry, reqs):

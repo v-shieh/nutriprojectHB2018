@@ -4,11 +4,16 @@
 <!-- ************************************************************* -->
 {% block content %}
     <h1>{{ session['user_name'] }}'s Food Log!</h1>
-    <h4>Please pick a date to display </h4>
+    <h4>Please pick a date to display: </h4>
 
     <div id='date'>
         <input type="text" id="datepicker" placeholder="month-day-year">
     </div>
+    
+    <p id='result'>
+        <b>Food log for: </b> <span id='todays-date'></span>
+        <span id='entry-result'></span>
+    </p>
 
 {% endblock %}
 <!-- ************************************************************* -->
@@ -23,6 +28,33 @@ $( function() {
 
   } );
 
+$('#datepicker').on('change', function(evt){
+    evt.preventDefault();
+    let date = {'date':
+        $('#datepicker').val().replace(/-/g, "")};
+        $('#todays-date').html($('#datepicker').val())
+    
+    $.get("/pull_history", 
+          date, 
+          onThisDay);
+});
+
+function onThisDay(result) {
+    if (result == 'none') {
+       $('#todays-date').append("<hr>")
+       $('#entry-result').text("Sorry! There is no entry for that day!");
+    }
+    else {
+        $('#todays-date').append("<hr>")
+        for (let key in result['food']) {
+            console.log(result['food'])
+            console.log(result['food'][key])
+            for (name in key) {
+                console.log(result['food'][key][name])
+            }
+        }
+    }
+};
 
 
 

@@ -175,8 +175,8 @@ def welcome_back():
     no_lim_dict = requirements[3]
     lim_dict = requirements[4]
 
-    # today = datetime.date.today().strftime("%m%d%Y")
-    all_foods_today = pull_foods_on_date('27022018', user_id)
+    today = datetime.date.today().strftime("%m%d%Y")
+    all_foods_today = pull_foods_on_date(today, user_id, 2)
 
     a = calculate_deficiency(all_foods_today, lim_dict)
     b = calculate_deficiency(all_foods_today, no_lim_dict)
@@ -194,7 +194,23 @@ def welcome_back():
 def show_history():
     """Lets user pick a date and displays the food info for that date"""
 
+    # Take in date and search in db for that date
+
     return render_template('food-log.html')
+
+
+@app.route('/pull_history')
+def pull_history():
+    """Route which pulls the info from the database"""
+
+    date = request.args.get("date")
+    user_id = session['user_id']
+    result = pull_foods_on_date(date, user_id, 1)
+
+    if type(result) == dict:
+        return jsonify(result)
+    else:
+        return result
 
 
 #############################################################################
