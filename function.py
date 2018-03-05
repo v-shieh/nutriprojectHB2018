@@ -426,11 +426,11 @@ def pull_daily_requirements(user_id):
 def pull_foods_on_date(date, user_id, option):
     """Pulls foods eaten on specified date by user"""
 
-    amt_eaten = {}
-
     # Query the db for all the entries entered by a user at a given date
     d = db.session.query(Food_Eaten.entry).filter(Food_Eaten.user_id == user_id, Food_Eaten.date_entered == date).all()
-    pprint(d)
+
+    if d == {}:
+        return {}
     if option == 1:
         if len(d) == 0:
             return 'none'
@@ -438,19 +438,29 @@ def pull_foods_on_date(date, user_id, option):
             items = {"food": d}
             return items
     elif option == 2:
-        dict_string = d[0][0].encode()  # Change into string from unicode
+        nut_dict = {}
 
-        data = json.loads(dict_string.encode())  # Load the string into a dict
-        data_keys = data.keys()  # Get all the keys
+        for i in d:
+            b = json.loads(i[0].encode())
+            for name in b:
+                for i in b[name]['nutrients']:
+                    nut_dict[i[0]] = nut_dict.get(i[0], 0) + i[2]
 
-        # For every key (food name), go through all the lists of nutrients. Add the nutrient id
-        # to the new amt_eaten. Use the get method to see if that key exists already. If not
-        # make the value 0 and--irregardless of the value--add the amount from the entry.
-        for key in data_keys:
-            for i in data[key]['nutrients']:
-                amt_eaten[i[0]] = amt_eaten.get(i[0], 0) + i[2]
+        return(nut_dict)
+        # dict_string = d[0][0].encode()  # Change into string from unicode
 
-        return amt_eaten
+        # data = json.loads(dict_string.encode())  # Load the string into a dict
+        # data_keys = data.keys()  # Get all the keys
+
+
+        # # For every key (food name), go through all the lists of nutrients. Add the nutrient id
+        # # to the new amt_eaten. Use the get method to see if that key exists already. If not
+        # # make the value 0 and--irregardless of the value--add the amount from the entry.
+        # for key in data_keys:
+        #     for i in data[key]['nutrients']:
+        #         amt_eaten[i[0]] = amt_eaten.get(i[0], 0) + i[2]
+
+        # # return amt_eaten
 
 
 def calculate_deficiency(entry, reqs):
@@ -464,10 +474,76 @@ def calculate_deficiency(entry, reqs):
     # Go through the requirement dict and use the nutri ids as the key for the deficiency
     # dict. Make the value the amt from the requirements minus the amount in the entries of that
     # day. Also add the units and name of the nutrient
-    for r in reqs:
-        deficiency[r] = reqs[r][0] - entry[r], reqs[r][1], reqs[r][2]
+    if entry == {}:
+        for r in reqs:
+            deficiency[r] = reqs[r][0], reqs[r][1], reqs[r][2]
+    else:
+        for r in reqs:
+            deficiency[r] = reqs[r][0] - entry[r], reqs[r][1], reqs[r][2]
 
     return deficiency
+
+
+def collect_data_no_limit(food_entry, nutrient_deficiency):
+    """
+    Takes in the data for these two elements and returns an array of consumed nutrients and
+    deficient nutrients.
+    """
+    deficiency_amt = []
+
+    # if food_entry == {}:
+    #     print "hi"
+    # Removes the two amounts that have upper-limits (They will not be displayed on the graph yet
+    # until it is clear that the user cannot eat more than the alotted amount)
+    food_entry.pop(303, None)
+    food_entry.pop(323, None)
+
+    # Gets the keys and values of the deficiency information passed in from another function called
+    # from the server
+    deficiency_k = nutrient_deficiency.keys()
+    deficiency_v = nutrient_deficiency.values()
+
+    # Clean the data to only get the integer amount
+    for i in deficiency_v:
+        deficiency_amt.append(i[0])
+
+    # Get a sorted tuple of zipped items based on consumed and deficient foods
+    if food_entry:
+        food_zip = sorted(food_entry.items())
+    deficiency_zip = sorted(zip(deficiency_k, deficiency_amt))
+
+    consumed = []
+    deficient = []
+    con_percentages = []
+    def_percentages = []
+
+    # Clean up the data
+    if food_entry:
+        for a in food_zip:
+            consumed.append(a[1])
+    else:
+        consumed = [0] * 14
+        print "in right place"
+
+    # print consumed
+    # print food_entry
+
+    for b in deficiency_zip:
+        deficient.append(b[1])
+
+    # Make another zipped data with data in question (consumed or deficient) and totals
+    totals = map(sum, zip(consumed, deficient))
+    con_map = zip(consumed, totals)
+    def_map = zip(deficient, totals)
+
+    # Take each total and get the percentage of consumed and deficient
+    for i in con_map:
+        con_percentages.append((i[0]/i[1])*100)
+
+    for i in def_map:
+        def_percentages.append(i[0]/i[1]*100)
+
+    return con_percentages, def_percentages
 
 
 if __name__ == "__main__":

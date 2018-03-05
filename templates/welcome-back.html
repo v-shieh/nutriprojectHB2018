@@ -5,7 +5,7 @@
 {% block content %}
     <h1>Welcome back, {{ session['user_name'] }}!</h1>
     <h2>Here is your daily summary: </h2>
-
+<canvas id="myChart"></canvas>
 <div class = 'wrapper'>
     <div id ='min-req'>
         <h3>Daily Minimum Requirements:</h3>
@@ -41,18 +41,20 @@
     </div>
 </div>
 
+
+
 {% endblock %}
 <!-- ************************************************************* -->
 
 {% block JQ %}
 <script>
-    $(function() {
-            $('.wrapper').css({
-                'width' : '600px'
-                'height' : '200px'
-            });
+    // $(function() {
+    //         $('.wrapper').css({
+    //             'width' : '600px',
+    //             'height' : '200px'
+    //         });
 
-    });
+    // });
 
     $(function() {
             $('.reqs').css({
@@ -66,5 +68,62 @@
             });
 
     });
+
+// Charts.io
+$(function() {
+            $('#myChart').css({
+                'max-width' : '800px',
+                'max-height' : '800px'
+
+    })
+});
+// Charts.io
+
+
+        var barChartData = {
+            labels: ['Calcium (mg)', 'Magnesium (mg)', 'Phosphorous (mg)', 'Potassium (mg)', 'Zinc (mg)', 'Vitamin A (RAE)', 'Vitamin D (μg)', 'Vitamin C (mg)', 'Vitamin B1/Thiamin (mg)', 'Vitamin B2/Riboflavin (mg)', 'Vitamin B3/Niacin (mg)', 'Vitamin B6 (mg)', 'Vitamin B9/Folate (μg)', 'Vitamin K (μg)'],
+            datasets: [{
+                label: 'Consumed',
+                backgroundColor: 'rgba(114, 172, 1, 0.4)',
+                borderColor:'rgba(114, 172, 1, 1)',
+                borderWidth: 1,
+                data: {{ consumed_data|safe }} // First idx = first chart etc
+            }, {
+                label: 'Deficient',
+                backgroundColor: 'rgba(74, 74, 74, 0.4)',
+                borderColor:'rgba(74, 74, 74, 1)',
+                borderWidth: 1,
+                data: {{ deficient_data|safe }} // First idx = first chart etc
+            }]
+
+        };
+        window.onload = function() {
+            var ctx = $("#myChart");
+            var myChart = new Chart(ctx, {
+                type: 'bar',
+                data: barChartData,
+                options: {
+                    title: {
+                        display: true,
+                        text: 'Daily Nutrients in %'
+                    },
+                    tooltips: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    responsive: true,
+                    scales: {
+                        xAxes: [{
+                            stacked: true,
+                        }],
+                        yAxes: [{
+                            stacked: true
+                        }]
+                    }
+                }
+            });
+        };
+
+    
 </script>
 {% endblock %}
