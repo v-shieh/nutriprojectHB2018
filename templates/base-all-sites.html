@@ -1,10 +1,32 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <style>
+    /*body {
+        background-image: url("/static/seigaiha.png");
+        background-repeat: repeat;
+        /*box-shadow: inset 5000px 5000px rgba(114, 172, 1, 0.2);*/
+        /*background-color: rgba(114, 172, 1, 0.4);*/
+        /*background-size: cover;*/
+    /*}*/
+
+    /*.background-cover {
+      background-color: rgba(114, 172, 1, 0.15);
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }*/
+  </style>
+  {% block head %}{% endblock %}
     <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous"> -->
     <title>{% block title %}INSERT DAT TITLE{% endblock %}</title>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 </head>
 <body>
+<div class='background-cover'>
+
 {% with messages = get_flashed_messages() %}
   {% if messages %}
     <script>
@@ -18,7 +40,6 @@
 
 {% block content %}BALOONICORN SAYS ENTER AWESOMENESS{% endblock %} 
 <link href="static/jquery.modal.css" type="text/css" rel="stylesheet" />
-<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 <script src="http://code.jquery.com/jquery-latest.min.js"></script>
 <script src="static/jquery.modal.min.js"></script>
@@ -33,14 +54,16 @@
 
     $(function() {
             $('#foot-logo').css({
-                'margin-left' : '45%',
+                'left' : '50%',
+                'bottom' : '0px',
+                'margin-left' : function() {return -$(this).outerWidth()/2},
+                'margin-top' : function() {return -$(this).outerHeight()/2},
                 'color' : 'white'
             });
         });
 
 </script>
-<!-- <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script> -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+</div>
 </body>
 </html>

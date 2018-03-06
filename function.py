@@ -476,10 +476,13 @@ def calculate_deficiency(entry, reqs):
     # day. Also add the units and name of the nutrient
     if entry == {}:
         for r in reqs:
-            deficiency[r] = reqs[r][0], reqs[r][1], reqs[r][2]
+            deficiency[r] = abs(reqs[r][0]), abs(reqs[r][1]), reqs[r][2]
     else:
         for r in reqs:
-            deficiency[r] = reqs[r][0] - entry[r], reqs[r][1], reqs[r][2]
+            if reqs[r][0] < entry[r]:
+                deficiency[r] = 0, reqs[r][1], reqs[r][2]
+            else:
+                deficiency[r] = abs(reqs[r][0]) - abs(entry[r]), reqs[r][1], reqs[r][2]
 
     return deficiency
 
@@ -490,7 +493,7 @@ def collect_data_no_limit(food_entry, nutrient_deficiency):
     deficient nutrients.
     """
     deficiency_amt = []
-
+    # print nutrient_deficiency
     # if food_entry == {}:
     #     print "hi"
     # Removes the two amounts that have upper-limits (They will not be displayed on the graph yet
@@ -535,6 +538,7 @@ def collect_data_no_limit(food_entry, nutrient_deficiency):
     totals = map(sum, zip(consumed, deficient))
     con_map = zip(consumed, totals)
     def_map = zip(deficient, totals)
+    # print def_map
 
     # Take each total and get the percentage of consumed and deficient
     for i in con_map:

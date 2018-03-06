@@ -1,34 +1,41 @@
 {% extends 'base.html' %}
 
+
 {% block title %}Nutrition: Home{% endblock %}
 <!-- ************************************************************* -->
 {% block content %}
 
 <div id="sign-in-box">
-    <div id='sign-in-form'>
-    <h1>Welcome! </h1> 
+    <div id='sign-in-form' align='center'>
+        <div id='welcome'>
+            <h1>Welcome! </h1> 
+        </div>
+
     <form class='sign-in' action="/double_check" method='POST'>
             <label name='sign-in-page'> 
-                <b>Email: </b><input type="email" id="email" name="email" placeholder='email@domain.com' maxlength='256' required><br>
+                <b>Email:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b><input type="email" id="email" name="email" placeholder='email@domain.com' maxlength='256' required><br>
                 <b>Password: </b><input type="password" id="pw" name="pw" placeholder='cAsE SeNsItiVe' required>
             </label><br><br>
-        <div id='submit-buttons'>
+        <div id='submit-buttons' align="center">
                 <input type="submit" value="Sign-in"><button type='button' id="register-button">Register!</button>
         </div>
         </form>
     </div>
 </div>
 
-<div class="homepage-hero-module">
-    <div class="video-container">
-        <div class="filter"></div>
-        <video autoplay loop class="fillWidth">
-            <source src="/static/IMG.VID/Veggie-Stand.mp4" type="video/mp4" />Your browser does not support the video tag. I suggest you upgrade your browser.
-            <source src="/static/IMG.VID/Veggie-Stand.webm" type="video/webm" />Your browser does not support the video tag. I suggest you upgrade your browser.
-        </video>
-        <!-- <div class="poster hidden">
-            <img src="/static/IMG.VID/Veggie-Stand.jpg" alt="">
-        </div> -->
+
+<div class='container-fluid'>
+    <div class="homepage-hero-module">
+        <div class="video-container">
+            <div class="filter"></div>
+            <video autoplay loop class="fillWidth">
+                <source src="/static/IMG.VID/Veggie-Stand.mp4" type="video/mp4" />Your browser does not support the video tag. I suggest you upgrade your browser.
+                <source src="/static/IMG.VID/Veggie-Stand.webm" type="video/webm" />Your browser does not support the video tag. I suggest you upgrade your browser.
+            </video>
+            <!-- <div class="poster hidden">
+                <img src="/static/IMG.VID/Veggie-Stand.jpg" alt="">
+            </div> -->
+        </div>
     </div>
 </div>
 
@@ -41,10 +48,11 @@
     <script>
     $(function() {
             $('.homepage-hero-module').css({
-                'position' : 'absolute',
+                'position' : 'fixed',
                 'top' : '-20px',
                 'left' : '-20px',
                 'width' : '100%',
+                // 'overflow': 'hidden',
                 'z-index' : -1
             });
         });
@@ -52,12 +60,11 @@
 
         $(function() {
             $('#sign-in-form').css({
-                'position' : 'absolute',
-                'left' : '50%',
-                'top' : '50%',
+                // 'left' : '50%',
+                'margin' : '250px -10px -10px -10px',
                 'padding' : '3%',
-                'margin-left' : function() {return -$(this).outerWidth()/2},
-                'margin-top' : function() {return -$(this).outerHeight()/2},
+                'width' : '100%',
+                'box-shadow': '10px 5px 5px rgba(60, 60, 60, .3)',
                 'background': 'rgb(255, 255, 255)',
                 'background': 'rgba(255, 255, 255, 0.5)'
 

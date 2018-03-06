@@ -180,18 +180,17 @@ def welcome_back():
     # all_foods_today = pull_foods_on_date('today', user_id, 2)
 
     # print all_foods_today
+    # print no_lim_dict
     # print "****"
     a = calculate_deficiency(all_foods_today, lim_dict)
     # print a
     b = calculate_deficiency(all_foods_today, no_lim_dict)
-    # print b
+    print b
     upper_lim_def = a.values()
     minimum_def = b.values()
     # print type(minimum_def)
 
     data = collect_data_no_limit(all_foods_today, b)
-    print b
-    # print data[1]
 
     return render_template('welcome-back.html',
                            no_lim=requirements_no_limit,

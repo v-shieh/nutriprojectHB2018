@@ -1,31 +1,48 @@
-{% extends 'base.html' %}
+{% extends 'base-all-sites.html' %}
 
+{% block head %}
+<style>
+    body {
+        background-image: url("/static/food-layout.jpeg");
+        background-repeat: repeat-y;
+        /*background-position: center;*/
+        margin: -5px;
+        background-size: 100% auto;
+    }
+</style>
+{% endblock %}
 {% block title %}Nutrition: Registration{% endblock %}
 <!-- ************************************************************* -->
 {% block content %}
-<div id="registration-form">
-    <h1> So glad you're joining us! </h1>
-<form id='registration' action="/welcome_newbie" method='POST'>
-            <label name='registration-page'>
-            <div id="account-info">
-                <h3>Account info: </h3>
-                <b>Email: </b><input type="email" id="reg-email" name="reg-email" placeholder='Bcorn@unicorn.me' maxlength='60' required><br>
-                <b>Password: </b><input type="password" id="pw" name="pw" placeholder='password' required>
-            </div>
-            <div id="about-you"> 
-                <h3>Tell us about you:</h3>
-                <b>First name: </b><input type="text" id="fname" name="fname" placeholder='Balloonicorn' maxlength='20' required><br>
-                <b>Last name: </b><input type="text" id="lname" name="lname" placeholder='Unicorn' maxlength='20' required><br>
-                
-                <b>Age: </b><input type="number" id="age" name="age" min="1" max="101" placeholder='1' required><br>
-                <b>Biological gender: </b><input type="radio" name="gender" value="M" checked> Male
-                <input type="radio" name="gender" value="F"> Female<br>
-            </div><br>
-            </label><br><br>
-        <div id='submit-buttons'>
-                <input type="submit" value="Sign Me Up!">
+<div class="container-fluid">
+    <div class="row">
+        <div id="registration-form" style="color: #1A1A1A;">
+            <h1> So glad you're joining us! </h1>
+        <form id='registration' action="/welcome_newbie" method='POST'>
+                    <label name='registration-page'>
+                    <div id="account-info">
+                        <h3>Account info: </h3>
+                        <b>Email:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b><input type="email" id="reg-email" name="reg-email" placeholder='Bcorn@unicorn.me' maxlength='60' required><br>
+                        <b>Password: </b><input type="password" id="pw" name="pw" placeholder='password' required>
+                    </div>
+                    <div id="about-you"> 
+                        <h3>Tell us about you:</h3>
+                        <b>First name: </b><input type="text" id="fname" name="fname" placeholder='Balloonicorn' maxlength='20' required><br>
+                        <b>Last name: &nbsp;</b><input type="text" id="lname" name="lname" placeholder='Unicorn' maxlength='20' required><br>
+                        
+                        <b>Age: &nbsp;&nbsp;&nbsp;</b><input type="number" id="age" name="age" min="1" max="101" placeholder='1' required><br>
+                        <b>Biological gender: </b>
+                        <input type="radio" name="gender" value="F"> Female
+                        <input type="radio" name="gender" value="M" checked> Male
+                        <br>
+                    </div><br>
+                    </label>
+                <div id='submit-buttons'>
+                        <input type="submit" value="Sign Me Up!">
+                </div>
+        </form>
         </div>
-</form>
+    </div>
 </div>
 {% endblock %}
 <!-- ************************************************************* -->
@@ -34,14 +51,20 @@
     <script>
         $(function() {
             $('#registration-form').css({
-                'position' : 'absolute',
-                'left' : '50%',
-                'top' : '50%',
-                'margin-left' : function() {return -$(this).outerWidth()/2},
-                'margin-top' : function() {return -$(this).outerHeight()/2},
+                // 'position' : 'absolute',
+                // 'left' : '50%',
+                // 'top' : '50%',
+                'margin-top': '250px',
+                'width' : '100%',
+                'text-align' : 'center',
+                // 'margin-left' : function() {return -$(this).outerWidth()/2},
+                // 'margin-top' : function() {return -$(this).outerHeight()/2},
+                'background': 'rgb(255, 255, 255)',
+                'background': 'rgba(255, 255, 255, 0.45)'
             });
         });
-        
+
+
         function inDb(result) {
             console.log(result)
             if (result == '200') {
@@ -53,6 +76,14 @@
                 $('#reg-email').css('border-color', 'green');
             }
         }
+
+
+        $(function() {
+            $('#submit-buttons').css({
+                'padding' : '2px'
+            });
+        });
+
 
         $( "#reg-email" ).change(function(evt) {
                 evt.preventDefault();
