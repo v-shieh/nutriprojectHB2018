@@ -3,23 +3,36 @@
 {% block title %}Nutrition: Welcome!{% endblock %}
 <!-- ************************************************************* -->
 {% block content %}
-    <h1>Welcome back, {{ session['user_name'] }}!</h1>
-    <h2>Here is your daily summary: </h2>
-<canvas id="myChart"></canvas>
-<div class = 'wrapper'>
-    <div id ='min-req'>
-        <h3>Daily Minimum Requirements:</h3>
-        {% for i in no_lim %}
-            <b>{{ i[0] }}</b>: {{ i[2] }} {{ i[3] }}<br>
-        {% endfor %}
+<div class='container'>
+    <div class='row' id='nutri-requirements'>
+
+        <div class='col-lg-offset-2'>
+                <h1>Welcome back, {{ session['user_name'] }}!</h1>
+                <h2>Here is your daily summary: </h2>
+
+                <canvas id="myChart"></canvas>
+            <div class='col-lg-4'>
+                <div id ='min-req'>
+                    <h3>Daily Minimum Requirements:</h3>
+                    {% for i in no_lim %}
+                        <b>{{ i[0] }}</b>: {{ i[2] }} {{ i[3] }}<br>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class='col-lg-4'>
+                <div id='max-lim'>
+                    <h3>Daily Micronutrient Limits</h3>
+                    {% for i in lim %}
+                        <b>{{ i[0] }}</b>: {{ i[2] }} {{ i[3] }}<br>
+                    {% endfor %}
+                </div>
+            </div>
+
+        </div>
     </div>
 
-    <div id='max-lim'>
-        <h3>Daily Micronutrient Limits</h3>
-        {% for i in lim %}
-            <b>{{ i[0] }}</b>: {{ i[2] }} {{ i[3] }}<br>
-        {% endfor %}
-    </div>
+
+
 
 </div>
 <br><br><hr>
@@ -42,16 +55,15 @@
 </div>
 
 
-
 {% endblock %}
 <!-- ************************************************************* -->
 
 {% block JQ %}
 <script>
     // $(function() {
-    //         $('.wrapper').css({
-    //             'width' : '600px',
-    //             'height' : '200px'
+    //         $('.nutri-requirements').css({
+    //             'margin' : 'auto',
+    //             'max-width' : '500px'
     //         });
 
     // });

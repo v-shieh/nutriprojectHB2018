@@ -1,15 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
+  {% block head %}
   <style>
-    /*body {
-        background-image: url("/static/seigaiha.png");
+    body {
+        /*background-image: url("/static/seigaiha.png");
         background-repeat: repeat;
-        /*box-shadow: inset 5000px 5000px rgba(114, 172, 1, 0.2);*/
-        /*background-color: rgba(114, 172, 1, 0.4);*/
-        /*background-size: cover;*/
-    /*}*/
-
+        box-shadow: inset 5000px 5000px rgba(114, 172, 1, 0.2);
+        background-color: rgba(114, 172, 1, 0.4);
+        background-size: auto; 
+        z-index: 1;
+*/
     /*.background-cover {
       background-color: rgba(114, 172, 1, 0.15);
       position: absolute;
@@ -17,16 +18,27 @@
       left: 0;
       width: 100%;
       height: 100%;
-    }*/
+      z-index: 5;
+    }
+  }*/}
+
   </style>
-  {% block head %}{% endblock %}
+  {% endblock %}
     <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous"> -->
     <title>{% block title %}INSERT DAT TITLE{% endblock %}</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link href="static/jquery.modal.css" type="text/css" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="static/jquery.modal.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 </head>
 <body>
-<div class='background-cover'>
 
+<div class='container-fluid' id='background'>
+  <div id='background-overlay'>
 {% with messages = get_flashed_messages() %}
   {% if messages %}
     <script>
@@ -39,13 +51,7 @@
 {% endwith %}
 
 {% block content %}BALOONICORN SAYS ENTER AWESOMENESS{% endblock %} 
-<link href="static/jquery.modal.css" type="text/css" rel="stylesheet" />
-<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-<script src="http://code.jquery.com/jquery-latest.min.js"></script>
-<script src="static/jquery.modal.min.js"></script>
-<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
+
 
 {% block JQ %}{% endblock %}
 <br><br><br>
@@ -62,8 +68,28 @@
             });
         });
 
+    $(function() {
+            $('#background').css({
+                'background-image': 'url("/static/seigaiha.png")',
+                'background-repeat': 'repeat',
+                'background-size': 'auto'
+                // 'background' : 'linear-gradient(rgba(114, 172, 1, 0.15)', 'rgba(114, 172, 1, 0.15)), url("/static/seigaiha.png")'
+            });
+        });
+
+    // $(function() {
+    //         $('#background-overlay').css({
+    //             'background-color': 'rgba(114, 172, 1, 0.15)',
+    //             'background-size': 'auto',
+    //             'top': '0',
+    //             'left': '0',
+    //             'width': '100%',
+    //             'height': '100%'
+    //         });
+    //     });
+
 </script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+  </div>
 </div>
 </body>
 </html>
