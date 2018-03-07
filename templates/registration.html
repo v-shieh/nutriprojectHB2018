@@ -1,4 +1,4 @@
-{% extends 'base-all-sites.html' %}
+{% extends 'base.html' %}
 
 {% block head %}
 <style>
@@ -8,6 +8,7 @@
         /*background-position: center;*/
         margin: -5px;
         background-size: 100% auto;
+        font-size:48px;
     }
 </style>
 {% endblock %}
@@ -17,16 +18,16 @@
 <div class="container-fluid">
     <div class="row">
         <div id="registration-form" style="color: #1A1A1A;">
-            <h1> So glad you're joining us! </h1>
+            <h1><b> So glad you're joining us! </b></h1>
         <form id='registration' action="/welcome_newbie" method='POST'>
                     <label name='registration-page'>
                     <div id="account-info">
-                        <h3>Account info: </h3>
+                        <h3><b>Account info: </b></h3>
                         <b>Email:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b><input type="email" id="reg-email" name="reg-email" placeholder='Bcorn@unicorn.me' maxlength='60' required><br>
                         <b>Password: </b><input type="password" id="pw" name="pw" placeholder='password' required>
                     </div>
                     <div id="about-you"> 
-                        <h3>Tell us about you:</h3>
+                        <h3><b>Tell us about you:</b></h3>
                         <b>First name: </b><input type="text" id="fname" name="fname" placeholder='Balloonicorn' maxlength='20' required><br>
                         <b>Last name: &nbsp;</b><input type="text" id="lname" name="lname" placeholder='Unicorn' maxlength='20' required><br>
                         
@@ -54,13 +55,13 @@
                 // 'position' : 'absolute',
                 // 'left' : '50%',
                 // 'top' : '50%',
-                'margin-top': '23%',
+                'margin-top': '15%',
                 'width' : '100%',
                 'text-align' : 'center',
                 // 'margin-left' : function() {return -$(this).outerWidth()/2},
                 // 'margin-top' : function() {return -$(this).outerHeight()/2},
                 'background': 'rgb(255, 255, 255)',
-                'background': 'rgba(255, 255, 255, 0.45)'
+                'background': 'rgba(255, 255, 255, 0.55)'
             });
         });
 

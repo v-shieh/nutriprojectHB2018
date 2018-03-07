@@ -140,7 +140,7 @@ def add_user():
     session['user_id'] = retrieve_new_user[1][0][0]
     session['user_name'] = (retrieve_new_user[1][0][1]).encode()
 
-    return render_template('welcome-newbie.html')
+    return redirect('/welcome-back')
 
 
 @app.route('/double_check', methods=['POST'])

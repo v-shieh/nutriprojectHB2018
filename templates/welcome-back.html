@@ -2,6 +2,10 @@
 
 {% block head %}
 <style>
+        
+        body {
+            font-size: 60px;
+        }
         #background-overlay{
         /*position: 'fixed';*/
         width: 100%;
@@ -17,14 +21,14 @@
 {% block content %}
 <div class='container'>
         <div class='col-xs-12' id='scroll'>
-                <h1>Welcome back, {{ session['user_name'] }}!</h1>
+                <h1><b>Welcome back, {{ session['user_name'] }}!</b></h1>
                 <h2>Here is your daily summary: </h2>
         </div>
                 <canvas id="myChart"></canvas>
         <div class='row' id='nutri-leftovers'>
             <div class='col-xs-12 col-md-6 col-lg-6'>
                 <div id='upper-lim-def'>
-                    <h3>Micronutrients With Upper Limit</h3>
+                    <h3><b>Micronutrients With Upper Limit</b></h3>
                     <b>You may consume up to this amount for the rest of the day: </b><br><br>
                     {% for i in upper_def %}
                     <b>{{ i[2] }}</b>: {{ i[0] }} {{ i[1] }}<br>
@@ -33,7 +37,7 @@
             </div>
             <div class='col-xs-12 col-md-6 col-lg-6'>
                 <div id='no-upper'>
-                    <h3>Micronutrients With Upper Limit</h3>
+                    <h3><b>Micronutrients With Upper Limit</b></h3>
                     <b>This is the remaining amount you need to meet your goal:</b><br><br>
                         {% for i in no_upper_def %}
                             <b>{{ i[2] }}</b>: {{ i[0] }} {{ i[1] }}<br>
@@ -45,7 +49,7 @@
         <div class='row' id='nutri-requirements'>
             <div class='col-offset-4 col-xs-12 col-md-6 col-lg-6'>
                 <div id ='min-req'>
-                    <h3>Daily Minimum Requirements:</h3>
+                    <h3><b>Daily Minimum Requirements:</b></h3>
                     {% for i in no_lim %}
                         <b>{{ i[0] }}</b>: {{ i[2] }} {{ i[3] }}<br>
                     {% endfor %}
@@ -53,7 +57,7 @@
             </div>
             <div class='col-xs-12 col-md-6 col-lg-6'>
                 <div id='max-lim'>
-                    <h3>Daily Micronutrient Limits</h3>
+                    <h3><b>Daily Micronutrient Limits</b></h3>
                     {% for i in lim %}
                         <b>{{ i[0] }}</b>: {{ i[2] }} {{ i[3] }}<br>
                     {% endfor %}

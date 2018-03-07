@@ -7,7 +7,8 @@
         width: 100%;
         height: auto;
         background: url("/static/food-layout4.jpg") center no-repeat;
-        background-size: auto;
+        background-attachment: fixed;
+        background-size: cover;
       }
 </style>
 {% endblock %}
@@ -18,7 +19,7 @@
 {% block content %}
 <div class='container'>
     <div class='col-xs-12' id='scroll' align='center'>
-    <h3>Food Tracker</h3>
+    <h3><b>Food Tracker</b></h3>
     </div>
     <div class='row' id='search-box' align='center'>
     <form id='food-request' action="/search" method='POST'>

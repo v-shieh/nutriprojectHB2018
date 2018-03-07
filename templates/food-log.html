@@ -1,25 +1,49 @@
-{% extends 'base.html' %}
+{% extends 'base-all-sites.html' %}
+
+{% block head %}
+<style>
+        body{
+        width: 100%;
+        height: auto;
+        background: url("/static/food-layout7.jpg") no-repeat center;
+        background-attachment: fixed;
+        background-size: auto;
+      }
+</style>
+{% endblock %}
 
 {% block title %}Nutrition: Welcome!{% endblock %}
 <!-- ************************************************************* -->
 {% block content %}
-    <h1>{{ session['user_name'] }}'s Food Log!</h1>
+<div class='container'>
+    <h1><b>{{ session['user_name'] }}'s Food Log!</b></h1>
     <h4>Please pick a date to display: </h4>
 
-    <div id='date'>
+    <div id='date' >
         <input type="text" id="datepicker" placeholder="month-day-year">
     </div>
-    
-    <p id='result'>
-        <b>Food log for: </b> <span id='todays-date'></span>
-        <span id='entry-result'></span>
-    </p>
-
+    <div class='row' id='inputs'>
+            <p id='result'>
+            <h4>&nbsp;&nbsp;&nbsp;<b>Food log for: </b><span id='todays-date'></span></h4>
+                <span id='entry-result'></span>
+            </div>
+            </p>
+    </div>
+</div>
 {% endblock %}
 <!-- ************************************************************* -->
 
 {% block JQ %}
 <script>
+$(function() {
+    $('.container').css({
+        'background-color' : 'rgba(255, 255, 255,0.9)',
+        'width': '70%',
+        'padding' : '50px',
+        'height': 'auto'
+    })
+});
+
 $( function() {
     $( "#datepicker" ).datepicker({
         dateFormat: 'mm-dd-yy'
@@ -50,15 +74,16 @@ function onThisDay(result) {
         for (let inputs in result['food']) {
             let a = JSON.parse(result['food'][inputs][0])
             for (let key in a) {
-                $('#entry-result').append('<h3>' + key + '</h3>');
+                $('#entry-result').append('<h3><b>' + key + '</b></h3>');
                 for (let i in a[key]['nutrients']){
-                    $('#entry-result').append("<b>" + a[key]['nutrients'][i][1] + "</b>: " + a[key]['nutrients'][i][2]+ " " + a[key]['nutrients'][i][3] + "<br>");
+                    $('#entry-result').append("<b><div class='col-xs-12 col-md-6 col-lg-6'>" + a[key]['nutrients'][i][1] + "</b>: " + a[key]['nutrients'][i][2]+ " " + a[key]['nutrients'][i][3] + "</div>");
                 }
+            $('#entry-result').append('<br><br><br><br><br><br><br><br><hr>');    
             }
         }
     }
 };
-
+// <div class='col-lg-6'>
 
 
 </script>

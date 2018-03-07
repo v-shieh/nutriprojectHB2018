@@ -7,7 +7,8 @@
         width: 100%;
         height: auto;
         background: url("/static/food-layout6.jpg") center no-repeat;
-        background-size: auto;
+        background-attachment: fixed;
+        background-size: cover;
       }
 </style>
 {% endblock %}
@@ -19,7 +20,7 @@
 {% block content %}
 <div class='container'>
     <div class='row' id='title' style="margin-left: 60px">
-        <h2>Here are the nutrient levels for the foods inputted:</h2> <br><br><hr>
+        <h2><b>Here are the nutrient levels for the foods inputted:</b></h2> <br><br><hr>
     </div>
     
 
@@ -27,7 +28,7 @@
 <div class='row' id='displayed-inputs' style="margin-left: 50px">
     <div class='col-xs-12 col-md-6 col-lg-6'>
         {% for food_name in result %} 
-            <h4>{{ food_name }}</h4><br>
+            <h4><b>{{ food_name }}</b></h4><br>
         {% for i in result[food_name]["nutrients"] %}
             <b>{{ i[1] }} ({{ i[0] }}):</b> {{ i[2] }} {{ i[3] }}<br> 
         {% endfor %}

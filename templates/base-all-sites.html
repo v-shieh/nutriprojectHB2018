@@ -14,11 +14,14 @@
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css?family=Cormorant+Garamond:400,700|Oxygen|Raleway:400,700" rel="stylesheet">
     <style>
 
         body {
             position: relative;
             overflow-x: hidden;
+            /*font-family: 'Raleway', sans-serif;*/
+            font-family: 'Cormorant Garamond', serif;
         }
         body,
         html { height: 100%;}
@@ -348,7 +351,7 @@
                     <a href="http://localhost:5000/welcome-back">Home</a>
                 </li>
                 <li>
-                    <a href="http://localhost:5000/search">Food Log</a>
+                    <a href="http://localhost:5000/search">Food Tracker</a>
                 </li>
                 <li>
                     <a href="http://localhost:5000/food-log">History</a>
@@ -382,15 +385,13 @@
 
 {% block JQ %}{% endblock %}
 <br><br><br>
-<footer id='foot-logo'> &copy; 2018: Micronourish </footer>
+<footer id='foot-logo'> &copy; 2018: Micronourish || By: Vanessa Shieh</footer>
 <script>
 
     $(function() {
             $('#foot-logo').css({
-                'left' : '50%',
-                'bottom' : '0px',
-                'margin-left' : function() {return -$(this).outerWidth()/2},
-                'margin-top' : function() {return -$(this).outerHeight()/2},
+                'text-align': 'center',
+                'bottom' : 'auto',
                 'color' : 'white'
             });
         });
