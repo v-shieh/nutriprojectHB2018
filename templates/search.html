@@ -1,20 +1,36 @@
 {% extends 'base-all-sites.html' %}
 
+{% block head %}
+<style>
+        body{
+        /*position: 'fixed';*/
+        width: 100%;
+        height: auto;
+        background: url("/static/food-layout4.jpg") center no-repeat;
+        background-size: auto;
+      }
+</style>
+{% endblock %}
 {% block title %}Nutrition: Search{% endblock %}
 
 <!-- ************************************************************* -->
 
 {% block content %}
-
-<h3>Food Diary</h3>
-
+<div class='container'>
+    <div class='col-xs-12' id='scroll' align='center'>
+    <h3>Food Tracker</h3>
+    </div>
+    <div class='row' id='search-box' align='center'>
     <form id='food-request' action="/search" method='POST'>
         <label name='food-input'> 
             <input id="food-input" name="food-input" required>
         </label><br>
         <input type="submit" value="Search!">
     </form>
+    </div>
     <br><br>
+    <!-- <div id='send-input-button' align='center'> -->
+
     <form id='all-foods-eaten' action="/display_foods"  method='POST'>
         <!-- Creates a hidden field wit hthe name as food-num so that we can send
         this info over to the server later -->
@@ -23,14 +39,25 @@
         </div>
         <br>
         <input type="submit" value = "Confirm inputs" id="send-input">
+        <!-- </div> -->
     </form>
-
+</div>
 
 {% endblock %}
 <!-- ************************************************************* -->
 
 {% block JQ %}
     <script>
+        $(function() {
+            $('.container').css({
+                'background-color' : 'rgba(255, 255, 255,0.9)',
+                'width': '70%',
+                'padding' : '50px',
+                'height': 'auto'
+            })
+        });
+
+
     // Was used to make a dictionary to pass which did
     // not work
     let inputtedFoods = {}; 
@@ -118,14 +145,14 @@
             $('#food-num').val(foodNum); // Overwrite the hidden HTML id above to be foodNum
 
             // Append to the food's unique div the exact name of the food as shown in USDA. Create an 'X' delete button with a unique id pertaining to the food. Make a hidden input field which assigns the value to be the id of the food.
-            $('#' + name).append("<b>" + result[0] + "<b><button type=button id=" + buttonName + ">X</button><input type='hidden' name='food-name-" + foodNum + "' value=" + result[3] + "><input type='hidden' name='name-" + foodNum +"' value='(" + (result[0]) + ")'>").append("<br>") 
+            $('#' + name).append("<b>" + result[0] + "<b>&nbsp;<button type=button id=" + buttonName + "><span class='glyphicon glyphicon-trash' aria-hidden='true'></span></button><input type='hidden' name='food-name-" + foodNum + "' value=" + result[3] + "><input type='hidden' name='name-" + foodNum +"' value='(" + (result[0]) + ")'>").append("<br>") 
             // Append the basic serving size for the food according to the USDA and pulled from the local database. 
             $('#' + name).append("<i>Serving size: </i> " +  result[1] + " " + result[2])
             // Make a box where the user can input a positive number for the amount of servings they ate of the food. A confirm button and an edit button is shown. 
 
             // Once the confirm button is pressed, it is added to the HTML that is send to the server. If this entry is deleted, then the food id list and the user serving qty is just listed as 'None'
             // Once the edit button is pressed, it is enabled for editing. 
-            $('#' + name).append("<form id='serving-size'><input type='number' name='serving-size' id=" + servingName + " placeholder='Enter amt' min=0 required>serving(s)<button type=button id=" + confirmButton +">&#10004;</button><button type=button id=" + editButton + ">&#x270E</button></form>")
+            $('#' + name).append("<form id='serving-size'><input type='number' name='serving-size' id=" + servingName + " placeholder='Enter amt' min=0 required>serving(s)&nbsp;&nbsp;<button type=button id=" + confirmButton +"><span class='glyphicon glyphicon-ok' aria-hidden='true'></button>&nbsp;<button type=button id=" + editButton + "><span class='glyphicon glyphicon-pencil' aria-hidden='true'></button></form>")
             // Appends a hidden field which assigns the unique name 'serving-qty-<insert food name here>' as the id for the input box. Initially the value is ''
             $('#' + name).append("<input type='hidden' id='" + servingQtyName + "' name='" + servingQtyName + "' value=''><br>");
 

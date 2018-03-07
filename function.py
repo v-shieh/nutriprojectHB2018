@@ -476,7 +476,7 @@ def calculate_deficiency(entry, reqs):
     # day. Also add the units and name of the nutrient
     if entry == {}:
         for r in reqs:
-            deficiency[r] = abs(reqs[r][0]), abs(reqs[r][1]), reqs[r][2]
+            deficiency[r] = abs(reqs[r][0]), reqs[r][1], reqs[r][2]
     else:
         for r in reqs:
             if reqs[r][0] < entry[r]:
