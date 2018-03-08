@@ -238,7 +238,7 @@ if __name__ == "__main__":
 # Allows us to use our DebugToolbarExtension so it'll be true when we invoke it
 # ex. in python when we want to set up our server
 
-    app.debug = True
+    app.debug = False
     app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
     # Make sure that templates are not cached in debug mode
