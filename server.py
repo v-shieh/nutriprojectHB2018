@@ -27,16 +27,22 @@ def index():
 
     return render_template('homepage.html')
 
+
 @app.route('/search', methods=["GET"])
 def show_search():
     """Takes in input and sends it to the function which determines location"""
 
+    pull_autocomplete_food_names('0500')  # Poultry
+    pull_autocomplete_food_names(1000)  # Pork products
+    pull_autocomplete_food_names(1200)  # Nuts and seeds
     pull_autocomplete_food_names(1300)  # "Beef products"
     pull_autocomplete_food_names("0100")  # "Dairy and Egg Products"
     pull_autocomplete_food_names("0900")  # "Fruits and Fruit Juices"
     pull_autocomplete_food_names(1500)  # "Finfish and Shellfish Products"
+    pull_autocomplete_food_names(1800)  # Baked products
     pull_autocomplete_food_names(1100)  # "Vegetables and Vegetable Products"
     pull_autocomplete_food_names(1600)  # "Legumes and Legume Products"
+    pull_autocomplete_food_names(2000)  # Grains and pasta
 
     return render_template('search.html', food_info=None, searchlist=autocomp_search)
 
